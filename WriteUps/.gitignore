@@ -1,0 +1,14 @@
+*.nav
+*.out
+*.log
+*.snm
+*.vrb
+*~
+*.toc
+*.aux
+*.fls
+*.synctex.gz
+*.fdb*
+OSC-*.pdf
+OSC-*.tex
+

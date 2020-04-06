@@ -1,0 +1,197 @@
+#+TITLE:     The Prototype(JS) Saga: Episode III
+#+AUTHOR:    A. Jbara, L. Michel, A. Herzberg
+#+EMAIL:     ldm@engr.uconn.edu
+#+DATE: \today      
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+BEAMER_THEME: Berlin
+#+BEAMER_COLOR_THEME: beaver
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME:
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{comcast.png}}
+#+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
+
+
+#+name: setup-minted
+#+begin_src emacs-lisp :exports none
+  (setq org-latex-listings 'minted)
+      (setq org-latex-custom-lang-environments
+	    '(
+	     (emacs-lisp "common-lispcode")
+	      ))
+      (setq org-latex-minted-options
+	    '(("frame" "lines")
+	      ("fontsize" "\\scriptsize")
+	      ("linenos" "")))
+      (setq org-latex-to-pdf-process
+	    '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+
+* Purpose
+*** Recall
+
+- Prototype is an NPM package (version 0.0.5) **Server Side**
+- PrototypeJS is a git package (version 1.7.3)  **Client Side**
+
+#+LaTeX:\begin{exampleblock}{Caution}
+PrototypeJS is the ancestor of Prototype
+#+LaTeX:\end{exampleblock}
+
+*** Relation
+- Prototype is vulnerable to a code injection via ~evalScripts~
+- PrototypeJS could be ``converted'' to server-side easily
+
+#+LaTeX:\begin{alertblock}{Risk}
+- PrototypeJS contains the same ~evalScripts~
+- PrototypeJS has public APIs that call ~evalScripts~
+#+LaTeX:\end{alertblock}
+
+*** Smoking gun ? 
+Is there an actual vulnerability in PrototypeJS ?
+
+*** Other update
+
+- We are working on automation
+  - Extract known vulnerabilities from public database
+  - For specific classes of vulnerabilities 
+  - To validate the **Sink Finder**
+  - To discover patterns unknown to our Sink Finder (and manually
+    improve it). 
+
+* ProtoypeJS
+ 
+*** Punch line
+
+#+LaTeX:\begin{exampleblock}{(Good) News}
+- Yes, PrototypeJS is vulnerable
+- Yes, we have an exploit
+#+LaTeX:\end{exampleblock}
+
+*** The crux
+
+It's the same ~evalScripts~ routine
+
+#+begin_src js :exports code
+function evalScripts() {
+    return this.extractScripts().map(function(script) { 
+        return eval(script) 
+    });
+}
+#+end_src
+
+*** The entry point
+
+- Two public APIs in PrototypeJS called ~update~ and ~replace~
+- For brevity, example uses `replace`
+
+#+begin_src js :exports code
+function replace(element, content) {
+    element = $(element);
+    if (content && content.toElement) {
+      content = content.toElement();
+    } else if (!Object.isElement(content)) {
+      content = Object.toHTML(content);
+      var range = element.ownerDocument.createRange();
+      range.selectNode(element);
+      content.evalScripts.bind(content).defer();
+      content = range.createContextualFragment(content.stripScripts());
+    }
+    element.parentNode.replaceChild(content, element);
+    return element;
+  }
+#+end_src
+
+*** Exploits
+
+- You could call ~evalScripts~ directly
+- You can call it via ~replace~ and ~update~
+- This is client-side, exploit occurs in the browser
+
+*** Exploit of ~replace~
+
+Consider a webpage with the following script
+
+#+begin_src js :exports code
+<script type="text/javascript" src="./prototype/dist/prototype.js"></script>
+<script type="text/javascript">
+searchAndReplace = function(){
+	let content = $("replace").value;
+	let searchName = $("search").value;
+	let element = search(searchName);
+	if (element){
+		$(element.id).replace(content);
+		//$(element.id).update(content);
+		$("output").update("Replace Complete");
+	} else {
+		$("output").update("No Results Found");
+	}
+	$("search").value = "";
+	$("replace").value = "";
+};
+</script>
+#+end_src
+
+*** HTML code
+:PROPERTIES:
+:BEAMER_opt: shrink=30
+:END:
+#+begin_src html :exports code
+<!DOCTYPE html>
+<html>
+	<style>
+		h1 { text-align: center;}
+		h2 { text-align: center;}
+	</style>
+	<body>
+		<script type="text/javascript" src="./prototype/dist/prototype.js"></script>
+		<script> search = ... </script>
+		<script> searchAndReplace = ... </script>
+		<h1 id="header">Exploit Example</h1>
+		<br>
+		<label for="test">Search for:</label>
+		<input id="search" type="text" name="name_field" value="" autocomplete="false">
+		<br>
+		<label for="test">Replace with:</label>
+		<input id="replace" type="text" name="name_field" value="" autocomplete="false">
+		<input type="submit" value="Replace" onclick="searchAndReplace()">
+		<br>
+		<br>
+		<p id="output"></p>
+		<br>
+		<h2 id="storage_header">Information</h2>
+		<div id="storage">
+			<p id="1">Alex</p><p id="2">John</p><p id="3">Will</p>
+			<p id="4">Sean</p><p id="5">Jake</p><p id="6">Sam</p>
+			<p id="7">Mike</p><p id="8">Matt</p><p id="9">Jordan</p>
+			<p id="10">Tom</p><p id="11">Jeff</p>
+		</div>
+	</body>
+</html>
+#+end_src
+
+*** Explanation
+
+1. Code looks for an element (/searchName/) it wishes to update
+2. Once the element is found, it invokes ~replace~ on the root of the
+   DOM
+3. There is no step 3!
+
+*** Demo
+
+#+LaTeX:\begin{alertblock}{Risk}
+Take a look at the behavior within a Browser
+#+LaTeX:\end{alertblock}
+
+

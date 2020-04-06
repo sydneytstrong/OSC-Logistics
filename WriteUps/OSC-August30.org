@@ -1,0 +1,181 @@
+#+TITLE:     Open Source Components Findings Summary 
+#+AUTHOR:    A. Jbara, L. Michel, A. Herzberg
+#+EMAIL:     ldm@engr.uconn.edu
+#+DATE: \today      
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+BEAMER_THEME: Berlin
+#+BEAMER_COLOR_THEME: beaver
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME:
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{comcast.png}}
+#+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
+
+
+#+name: setup-minted
+#+begin_src emacs-lisp :exports none
+  (setq org-latex-listings 'minted)
+      (setq org-latex-custom-lang-environments
+	    '(
+	     (emacs-lisp "common-lispcode")
+	      ))
+      (setq org-latex-minted-options
+	    '(("frame" "lines")
+	      ("fontsize" "\\scriptsize")
+	      ("linenos" "")))
+      (setq org-latex-to-pdf-process
+	    '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+
+
+* Purpose
+*** Recall
+
+Mid August results: we found...
+1. One false positive in your 50
+2. Three true positive in your 50 
+3. List of potentials to investigate
+4. Two true positive from the short list of "5"
+
+#+LaTeX:\begin{exampleblock}{Caution}
+These are specifically for ~JS~ code injection
+#+LaTeX:\end{exampleblock}
+
+*** Updates in last 2 weeks
+- Revisited prototypejs (different version)
+- Looked at several leads
+- Planned the next 3 months 
+
+#+LaTeX:\begin{exampleblock}{Today}
+- Review of the findings
+- Direction for methodology
+- Direction for tool improvements
+#+LaTeX:\end{exampleblock}
+
+* Workplan Improvements
+*** Timeline
+1. Current project ends December 31, 2019
+2. Three sets of tasks
+   - Broaden class of vulnerabilities
+   - Improve the tools
+   - Develop and offer a workshop
+*** Vulnerability classes
+- We wish to enhance the finder for
+  - OS Command injection
+  - SQL code injection
+*** Improve the tools
+Extend the Finder method
+- Apply to versions of packages with known issues
+- Detect sinks we do not recognize yet
+- We wish to /automate/ the sink ``mining''
+*** Develop a workshop
+1. Purpose
+   - Cover the methodology we used
+   - Transfer skills to Comcast engineers
+   - To be offered in December
+*** Reporting
+- We will file CVEs for 
+  1. Depot/Chai
+  2. Prototype (0.0.5)
+  3. PrototypeJS (1.7.3)
+  4. Jade
+
+*** Future Directions
+1. Extensions of tools beyond 2019 ?
+   - Support for other languages 
+   - Vulnerabilities beyond code injections
+   - Identify next low-hanging fruits with high ROI
+   - Automate analysis of sinks (call graphs/semantics)
+   - Apply to packages beyond list of 50
+2. Additional funding
+3. Publish results (methods) collaboratively with Comcast
+
+* Findings
+*** On Comcast(50) and Manual results so far
+\label{listbad}
+#+LaTeX:{\footnotesize
+- @ember/.../workerpool/dist/worker.js [104]
+- @ember/.../workerpool/dist/workerpool.js [1381]
+- @ember/.../workerpool/lib/worker.js [58]
+- ansi-to-html/test/cli.js [31]
+- babel-types/node_modules/to-fast-properties/index.js [10]
+- Bean/tests/support/syn/mouse.js [38,40]
+- Constantinople/index.js [94]
+- Depot/specs/vendor/chai.js [2333]
+- Jade/bin/jade.js [78,4510]
+- jquery-ui/external/requires [2071]
+- Prototype/lib/String.js [100,201]
+- Transformers/lib/transformers.js [319]
+- Vis/examples/graph3d/playground/playground.js [386]
+- vis/examples/timeline/other/requirejs/scripts/require.js [35]
+#+LaTeX:}
+
+*** PrototypeJS
+
+- The version from [http://prototypejs.org](http://prototypejs.org) is
+  1.7.3
+- This is a _client-side_ library
+- The library was _forked_ to create the version 0.0.5 on ~npm~
+- The fork is meant to make the library usable _server-side_
+
+#+LaTeX:\begin{alertblock}{Caution}
+The vulnerability in `npm` is inherited from [[http://prototypejs.org][http://prototypejs.org]]
+#+LaTeX:\end{alertblock}
+
+*** Concerns
+:PROPERTIES:
+:BEAMER_opt: shrink=10
+:END:
+- PrototypeJS still has ~evalScript~ in its implementation
+- PrototypeJS uses ~evalScript~ in **public** methods
+- One example: ~replace~
+#+begin_src js :exports code
+function replace(element, content) {
+    element = $(element);
+    if (content && content.toElement) {
+      content = content.toElement();
+    } else if (!Object.isElement(content)) {
+      content = Object.toHTML(content);
+      var range = element.ownerDocument.createRange();
+      range.selectNode(element);
+      content.evalScripts.bind(content).defer();
+      content = range.createContextualFragment(content.stripScripts());
+    }
+    element.parentNode.replaceChild(content, element);
+    return element;
+}
+#+end_src
+
+#+RESULTS:
+
+*** Replace
+Focus on the call to ~evalScript~
+#+begin_src js :exports code
+function replace(element, content) {
+       ...
+      content.evalScripts.bind(content).defer();
+       ...
+}
+#+end_src
+1. if ~content~ is given and convertible to an Element
+2. Convert it (safe path)
+3. Otherwise if it's not an element, see it as HTML
+4. And evaluate any embedded script!
+
+*** Bulk of the other leads 
+- Are _client-side_ issues
+
+**Do we have rejections** (false positive to report)
+

@@ -1,0 +1,122 @@
+#+TITLE:     Update
+#+AUTHOR:    A. Jbara, L. Michel, A. Herzberg
+#+EMAIL:     ldm@engr.uconn.edu
+#+DATE: \today      
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+BEAMER_THEME: Berlin
+#+BEAMER_COLOR_THEME: beaver
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME:
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{comcast.png}}
+#+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
+
+
+#+name: setup-minted
+#+begin_src emacs-lisp :exports none
+ (setq org-latex-listings 'minted)
+     (setq org-latex-custom-lang-environments
+           '(
+            (emacs-lisp "common-lispcode")
+             ))
+     (setq org-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+     (setq org-latex-to-pdf-process
+           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+
+
+* Overview
+
+* Manual Findings Summary
+*** Recall
+	Patterns the tool is searching for:
+	- ~eval()~
+	- ~obj[var].call()~
+	- ~obj[var].apply()~
+	- ~obj[var] ()~
+
+*** Packages Breakdown
+
+#+LaTeX:\begin{exampleblock}{}
+22% of the packages were flagged as suspicious
+#+LaTeX:\end{exampleblock}
+
+	| Packages | Sink Finder Results           | Percentage |
+	|----------+-------------------------------+------------|
+	|       50 | 15 (+7 external dependencies) |        22% |
+
+*** File Breakdown
+
+#+LaTeX:\begin{exampleblock}{Breakdown of the 15+7 (22) suspicious packages}
+- Level 0 = assessment within same function
+- Level 1 = requires analysis of calling sites
+#+LaTeX:\end{exampleblock}
+
+	| True + (L0) | L1  Interests | False + (L0) | Files Examined |
+	|-------------+---------------+--------------+----------------|
+	| 4 (1%)      | 18 (49%)      | 22 (50%)     |             44 |
+
+*** L0 false positive example
+
+Easy to eliminate
+ -  the attribute that history calls can only be one of two literals.
+
+#+name: eval-listing
+#+begin_src  js :exports code
+this.history[options.replace ? 'replaceState' 
+                               : 'pushState']({}, document.title, url);
+#+end_src
+
+* Automation Improvements
+*** Limitations for Sink Finder Improvements
+- Method is informative, but slow (manual).
+- Automation will save time and provide more metrics.
+*** Sink Finder Tool Extension
+- Tool currently searches local sources and reports sinks.
+- A database should be used to contain logistic, installation, and testing data.
+- Tool can then cross-reference across runs for more comprehensive data.
+*** Purpose of Extension
+- Verify that the tool is reliable in finding other documented vulnerabilities.
+	- Make the manual testing process an automated one.
+	- Track the progression of sinks across repository versions.
+*** Automation Benefits
+- Enhance speed and efficiency of future development.
+- Higher volume of test cases.
+- Facilitates easier tool modification.
+- Simplifies integration of our system.
+*** Process procedure
+- Obtain the information for packages containing a specific vulnerability from online DBs.
+- Run main tool on the known exploitable packages, then assess if vulnerabilities were found.
+- Evaluate/improve tool search pattern for vulnerability type based on findings from previous step.
+*** Visualization Of Process
+[[file:OSC-UConn-ToolExtension1-Obtaining.png]
+
+*** Visualization Of Testing
+[[file:OSC-UConn-ToolExtension2-Testing.png]]
+
+
+*** Next Steps for Scrubber Tool
+- interface with more databases for more test cases
+- Expand filtering for more vulnerabilities
+- Gather Statistics of tool performance
+*** Next Steps for Sink Tool finder
+- Use results from scrubber to find more sinks and reduce false positives.
+- Improve SQL and command injection patterns.
+- Verify the tool doesn't miss any patterns.
+* Questions and Comments?
+*** Questions?

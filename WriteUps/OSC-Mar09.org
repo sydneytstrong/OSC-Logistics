@@ -1,0 +1,239 @@
+#+TITLE:     OSC Update
+#+AUTHOR:    A. Jbara, L. Michel, A. Herzberg, J. Breslin
+#+EMAIL:     ldm@engr.uconn.edu
+#+DATE: \today
+#+DESCRIPTION:
+#+KEYWORDS:
+#+BEAMER_THEME: Berlin
+#+BEAMER_COLOR_THEME: beaver
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:
+#+LINK_HOME:
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{comcast.png}}
+#+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
+
+#+name: setup-minted
+#+begin_src emacs-lisp :exports none
+ (setq org-latex-listings 'minted)
+     (setq org-latex-custom-lang-environments
+           '(
+            (emacs-lisp "common-lispcode")
+             ))
+     (setq org-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+     (setq org-latex-to-pdf-process
+           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+* CVE Classification
+*** Natural Language Processing (NLTK)
+- Python framework for processing language data
+- Tested NLP ML library - Bayes Classifier
+- Tested 3000 training points, 75% accuracy
+- Limited training data ~40 CVEs
+- We are using NLP frequency analysis
+*** Frequency Analysis
+- Generated frequency distributions over 34 injection CVE
+- Normalization: eliminate symbols, lingustic stemming, remove stopwords
+- Glossary of terms: code, execut, arbitrari, inject, command, sqlite,
+  shell, sequel, sql, waterlin, postgr, mysql
+#+ATTR_LATEX: :width 5cm
+[[./stem.png]]
+*** Sample Set Frequency
+#+ATTR_LATEX: :width 6cm
+[[./sampleFreq.png]]
+- 34 Javacript CVEs
+- CWE-77 Command Injection, CWE-78 OS Command Injection, CWE-89 SQL
+  Injection, CWE-94 Code Injection 
+
+*** Frequency Results
+- 537 JavaScript CVEs
+- Likely relevant: 
+    - CWE-200 Information Exposure, 
+    - CWE-20 Improper Input Validation, 
+    - CWE-74 Injection 
+- Included: CWE-22,310,79,400,399,254
+*** Detailed Table
+#+ATTR_LATEX: :width 9cm
+[[./freq_res.png]]
+*** Test Set Frequency
+[[./testFreq.png]]
+*** Injection (CWE-74)
+- Command, data structure, or record with externally-influenced input.
+- Nine JS CVE under CWE-74 classification
+- Ex. CVE-2019-5479, larvitbase-api
+    - Provides a new signature.
+    - Code injection that relies on a dynamic require(), vulnerable to local file inclusion.
+- All nine were added to our sample set.
+*** Relevant CVE Analysis
+CVE-2016-10548 - Under CWE-94 (XSS)
+- Very relevant - 4 most relevant terms
+- Versions of reduce-css-calc pass input directly to eval.
+- Already covered signature.
+- If input is passed to the calc function it can lead to remote code execution on the server.
+- Added to our sample set.
+*** Continuation
+- Frequency Analysis over random CVE selection.
+- Determine set of distinquishing terms.
+- Distinguishing terms = Common in sample, uncommon in random sample
+- Weighting for distiguishing terms.
+- Manual analysis of high scoring CVE.
+* LGTM
+*** LGTM Extraction
+- The extractor turns every source file into a relational representation: "trap" file.
+- Separate extractor for each supported languages.
+- Each language has a unique database schema.
+- The schema specifies a table for every language construct.
+#+ATTR_LATEX: :width 6cm
+[[./lgtm-extraction.png]]
+*** LGTM Methodology
+[[./analysis_overview.png]]
+*** CodeQL Database
+- Contains hierarchical representation of the code base.
+- Defines classes to provide abstraction over the database tables. 
+- Object-oriented view of the data which makes it easier to write queries.
+- For JS program, three key tables: Expressions, Statements, Declarations
+- CodeQL library defines classes over these tables (and related auxiliary tables): Expr, Stmt, Decl.
+*** CodeQL CLI
+Javascript OSC QL Pack
+- Focusing on the AST tables in DB
+- 5 packages: depot, pouchdb, jade, prototype (prototypeJS),  mocha
+- Examination of depot0.1.6
+[[./depotSink.png]]
+*** Sink Finding (LGTM)
+#+ATTR_LATEX: :width 10cm
+[[./ExplainationQueryV2.png]]
+*** Continuation
+- Develop the sink finder methodology within LGTM
+  - Control Flow, Data Flow, Taint tracking, Bounds analysis
+- Develop CodeQL query for each sink found by Sink Finder.
+- Expand set of sinks based on expandig signatures.
+- Reduce false positives.
+- Generate alerts for full vulnerability (Sink/Source/Flow).
+* OSC Benchmark
+*** Score Card:
+The Benchmark Accuracy Score (Youden Index)
+- Accuracy: True Positive $Rate(TPR) = \frac{TP}{(TP + FN)}$
+- Precision or Sensitivity: False Positive $Rate(FPR) = \frac{FP}{(FP + TN)}$
+- Specificity: Normalized Distance From Guessing $Line = TPR - FPR$
+- Ranged 0-100
+*** JavaScript Benchmark
+- Built with synthetic examples
+- One true or false positive per test
+- Two expansion directions: 
+    - Use relevant CVEs for variant analysis 
+    - Generate deeper synthetic example (un-witnessed) from code obfuscation
+*** Benchmark Plan
+- Need access to more tools to justify benchmark
+- OWASP Benchmark requires manually generating scorecard
+- Script to ingest analysis results and generate score
+- Input the results for each test, boolean for whether a vulnerability was found
+- Generate scorecard based on the true/false positive and false negative rate
+*** Signatures
+#+LaTeX:\begin{exampleblock}{Injection Signature}
+#+begin_src  js :exports code
+type: 'cmdi',
+sinks: ['exec', 'execSync', 'spawn'],
+pattern: ['child_process']
+
+type: 'jsi',
+sinks: ['eval'],
+pattern: null
+#+end_src
+#+LaTeX:\end{exampleblock}
+Command injection:
+- eval() and (1, eval) (data)
+*** Bench Tests
+- Basic JS applet
+#+LaTeX:\begin{exampleblock}{Simple ~eval~ sink}
+#+begin_src  js :exports code
+app.post('/', function(req, res){
+        let param = req.body.name_field;
+        let x = param + " executed";
+        try {
+          x = eval(param);
+        } catch (e) {
+          x = param + " was used"
+        }
+        res.send(x)
+});
+#+end_src
+#+LaTeX:\end{exampleblock}
+* Paper
+*** Paper Proposals
+1. Sink Finder
+2. Tool Comparison (using benchmark)
+3. Sink Finder OSC findings
+4. Sink Obfuscation
+5. Obfuscation Solutions
+6. Sharpener (Finder or LGTM)
+7. CWE Catagories (CVE Classification)
+*** Sink Finder
+- Present the Sink Finder tool.
+- Pros - Identifies interesting signatures
+- Cons - False positives, limited novel innovation, relies on manual analysis
+*** Tool Comparison
+- Compare Sink Finder results against other tools.
+- Pros - Direct evaluation of the Sink Finders capabilities
+- Cons - Requires Sink Finder paper, limited results, no JS benchmark for past work, no false positive mitigation 
+*** Sink Finder OSC
+- Present our analysis of open source packages.
+- Pros - Real world application of Sink Finder
+- Cons - Limited results, relied on manual analysis
+*** Sink Obfuscation
+- Present the issue - What is sink/vulnerability obfuscation?
+- Possible to obfuscate a sink such that it is infeasible to detect them?
+    - Practical sense - Unlikely to be valuable in real scenarios.
+    - Theoretical sense - Proof of intractability. 
+- Can we show obfuscated things in OSC? Is it intentional?
+- What is the complexity of sink finding? 
+- Can we maintain semantic meaning while "removing" obfuscation?
+- Pros - Novel direction, builds on current work
+- Cons - Requires specialization, non-trivial research
+*** Obfuscation Solution
+- Defending against sink obfuscation.
+- Are obfuscated sinks an undecidable problem?
+- Programming language problem
+- Compiler/Engine modification
+- Pros - Novel direction, build on previous work
+- Cons - Requires Sink Obfuscation paper 
+*** Sharpener
+- Semi-automated improvement tool based on known vulnerability.
+- Problem: Not Enough Data. Limited set of CVE's.
+- Ingest CVE code vulnerability.
+- Output a signature to detect that vulnerability.
+- Pros - Possible Novel direction, interesting automation challenge
+- Cons - Limited data set, broad set of CWE required to expand data set 
+*** CVE Classification (CWE Categories)
+- Can we provide significantly more information than is available?
+- Can we aggregate data over multiple sources for each CVE?
+- Can classification be improved?
+- Multi-classification.
+- Pros - Possible novel direction, valuable for tool/benchmark
+- Cons - No NLP expert, requires data mining
+* Summary
+*** What We Have Done So Far
+- Evaluating sorted list of CVEs by relevance
+- Added 10 CVE to our sample of useable CVEs
+- Evaluation of LGTM Methodology
+- LGTM CodeQL query for sink finding
+- Built basic benchmark with 6 tests
+- Identified 2 new signatures from CVEs
+* Work Plan
+*** Feedback
+- Other directions?
+- New business items?
+* Questions and Comments?
+*** Questions?

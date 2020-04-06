@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<changelog xmlns="http://www.omnigroup.com/namespace/OmniPlan/v2">
+  <version>2.1</version>
+  <task-change-set user="Laurent Michel" date="2019-07-22T15:59:01.420Z" timestamp="2019-07-22T15:59:01.420Z">
+    <change idref="t13" to="t-1" to-position="0" resolved="yes">
+      <change idref="t13" attribute="isGroup" type="real" from="0" to="1"/>
+      <change idref="t13" attribute="taskType" type="real" from="0" to="2"/>
+      <change idref="t13" attribute="title" type="string" to="Phases"/>
+    </change>
+    <change idref="t6" to="t-1" to-position="1" resolved="yes">
+      <change idref="t6" attribute="effort" type="real" from="28800" to="57600"/>
+      <change idref="t6" attribute="internalAssignments" type="string" from="" to="4"/>
+      <change idref="t6" attribute="internalPrerequisitesString" type="string" to="1FS"/>
+      <change idref="t6" attribute="resourceLeveledDate" type="date" to="2019-08-13T12:00:00.000Z"/>
+      <change idref="t6" attribute="styleDict" type="dict" to="{&#10;    &quot;gantt-fill-color&quot; =     {&#10;        b = &quot;0.566152&quot;;&#10;        g = &quot;0.803&quot;;&#10;        r = &quot;0.440847&quot;;&#10;        space = srgb;&#10;    };&#10;}"/>
+      <change idref="t6" attribute="title" type="string" to="Phase 1 Eval on 50 Comcast OSC"/>
+    </change>
+    <change idref="t11" to="t-1" to-position="2" resolved="yes">
+      <change idref="t11" attribute="internalPrerequisitesString" type="string" to="6FS"/>
+      <change idref="t11" attribute="isGroup" type="real" from="0" to="1"/>
+      <change idref="t11" attribute="styleDict" type="dict" to="{&#10;    &quot;gantt-fill-color&quot; =     {&#10;        b = &quot;0.211432&quot;;&#10;        g = &quot;0.458381&quot;;&#10;        r = &quot;0.988&quot;;&#10;        space = srgb;&#10;    };&#10;}"/>
+      <change idref="t11" attribute="taskType" type="real" from="0" to="2"/>
+      <change idref="t11" attribute="title" type="string" to="Manual"/>
+    </change>
+    <change idref="t1" attribute="title" type="string" from="Task 1" to="P1: Vulnerability Search Tool" resolved="yes"/>
+    <change idref="t1" attribute="effort" type="real" from="28800" to="864000" resolved="yes"/>
+    <change idref="t1" attribute="internalAssignments" type="string" from="" to="4; 5" resolved="yes"/>
+    <change idref="t1" attribute="noEarlierThanConstraintDate" type="date" to="2019-07-23T12:00:00.000Z" resolved="yes"/>
+    <change idref="t1" attribute="resourceLeveledDate" type="date" to="2019-07-23T12:00:00.000Z" resolved="yes"/>
+    <change idref="t14" to="t3" to-position="0" resolved="yes">
+      <change idref="t14" attribute="effort" type="real" from="28800" to="144000"/>
+      <change idref="t14" attribute="internalAssignments" type="string" from="" to="4"/>
+      <change idref="t14" attribute="resourceLeveledDate" type="date" to="2019-08-26T17:00:00.000Z"/>
+      <change idref="t14" attribute="title" type="string" to="CFG use"/>
+    </change>
+    <change idref="t4" to="t3" to-position="1" resolved="yes">
+      <change idref="t4" attribute="effort" type="real" from="28800" to="144000"/>
+      <change idref="t4" attribute="internalAssignments" type="string" from="" to="5"/>
+      <change idref="t4" attribute="internalPrerequisitesString" type="string" to="14FS"/>
+      <change idref="t4" attribute="resourceLeveledDate" type="date" to="2019-09-02T17:00:00.000Z"/>
+      <change idref="t4" attribute="title" type="string" to="CG Use"/>
+    </change>
+    <change idref="t7" to="t11" to-position="0" resolved="yes">
+      <change idref="t7" attribute="effort" type="real" from="28800" to="144000"/>
+      <change idref="t7" attribute="internalAssignments" type="string" from="" to="4"/>
+      <change idref="t7" attribute="resourceLeveledDate" type="date" to="2019-08-15T12:00:00.000Z"/>
+      <change idref="t7" attribute="styleDict" type="dict" to="{&#10;    &quot;gantt-fill-color&quot; =     {&#10;        b = &quot;0.211432&quot;;&#10;        g = &quot;0.458381&quot;;&#10;        r = &quot;0.988&quot;;&#10;        space = srgb;&#10;    };&#10;}"/>
+      <change idref="t7" attribute="title" type="string" to="Manual OSC-1"/>
+    </change>
+    <change idref="t8" to="t11" to-position="1" resolved="yes">
+      <change idref="t8" attribute="effort" type="real" from="28800" to="144000"/>
+      <change idref="t8" attribute="internalAssignments" type="string" from="" to="5"/>
+      <change idref="t8" attribute="resourceLeveledDate" type="date" to="2019-08-15T12:00:00.000Z"/>
+      <change idref="t8" attribute="styleDict" type="dict" to="{&#10;    &quot;gantt-fill-color&quot; =     {&#10;        b = &quot;0.211432&quot;;&#10;        g = &quot;0.458381&quot;;&#10;        r = &quot;0.988&quot;;&#10;        space = srgb;&#10;    };&#10;}"/>
+      <change idref="t8" attribute="title" type="string" to="Manual OSC-2"/>
+    </change>
+    <change idref="t9" to="t11" to-position="2" resolved="yes">
+      <change idref="t9" attribute="effort" type="real" from="28800" to="144000"/>
+      <change idref="t9" attribute="internalAssignments" type="string" from="" to="4; 5"/>
+      <change idref="t9" attribute="resourceLeveledDate" type="date" to="2019-08-22T12:00:00.000Z"/>
+      <change idref="t9" attribute="styleDict" type="dict" to="{&#10;    &quot;gantt-fill-color&quot; =     {&#10;        b = &quot;0.211432&quot;;&#10;        g = &quot;0.458381&quot;;&#10;        r = &quot;0.988&quot;;&#10;        space = srgb;&#10;    };&#10;}"/>
+      <change idref="t9" attribute="title" type="string" to="Manual OSC-3"/>
+    </change>
+    <change idref="t1" from="t-1" from-position="0" to="t13" to-position="0" resolved="yes"/>
+    <change idref="t3" to="t13" to-position="1" resolved="yes">
+      <change idref="t3" attribute="internalPrerequisitesString" type="string" to="11FS"/>
+      <change idref="t3" attribute="isGroup" type="real" from="0" to="1"/>
+      <change idref="t3" attribute="noEarlierThanConstraintDate" type="date" to="2019-07-23T12:00:00.000Z"/>
+      <change idref="t3" attribute="taskType" type="real" from="0" to="2"/>
+      <change idref="t3" attribute="title" type="string" to="P2:  Attack Surface Tool"/>
+    </change>
+    <change idref="t2" to="t13" to-position="2" resolved="yes">
+      <change idref="t2" attribute="internalPrerequisitesString" type="string" to="11FS"/>
+      <change idref="t2" attribute="isGroup" type="real" from="0" to="1"/>
+      <change idref="t2" attribute="noEarlierThanConstraintDate" type="date" to="2019-07-23T12:00:00.000Z"/>
+      <change idref="t2" attribute="taskType" type="real" from="0" to="2"/>
+      <change idref="t2" attribute="title" type="string" to="P3: Vulnerability Finding Tool"/>
+    </change>
+    <change idref="t15" to="t2" to-position="0" resolved="yes">
+      <change idref="t15" attribute="effort" type="real" from="28800" to="144000"/>
+      <change idref="t15" attribute="internalAssignments" type="string" from="" to="3"/>
+      <change idref="t15" attribute="resourceLeveledDate" type="date" to="2019-08-26T17:00:00.000Z"/>
+      <change idref="t15" attribute="styleDict" type="dict" to="{&#10;    &quot;gantt-fill-color&quot; =     {&#10;        b = &quot;0.566152&quot;;&#10;        g = &quot;0.803&quot;;&#10;        r = &quot;0.440847&quot;;&#10;        space = srgb;&#10;    };&#10;}"/>
+      <change idref="t15" attribute="title" type="string" to="Aratha Eval"/>
+    </change>
+    <change idref="t16" to="t2" to-position="1" resolved="yes">
+      <change idref="t16" attribute="effort" type="real" from="28800" to="144000"/>
+      <change idref="t16" attribute="internalAssignments" type="string" from="" to="1"/>
+      <change idref="t16" attribute="internalPrerequisitesString" type="string" to="15FS"/>
+      <change idref="t16" attribute="resourceLeveledDate" type="date" to="2019-09-02T17:00:00.000Z"/>
+      <change idref="t16" attribute="styleDict" type="dict" to="{&#10;    &quot;gantt-fill-color&quot; =     {&#10;        b = &quot;0.566152&quot;;&#10;        g = &quot;0.803&quot;;&#10;        r = &quot;0.440847&quot;;&#10;        space = srgb;&#10;    };&#10;}"/>
+      <change idref="t16" attribute="title" type="string" to="TestGen Eval"/>
+    </change>
+    <change idref="t17" to="t2" to-position="2" resolved="yes">
+      <change idref="t17" attribute="effort" type="real" from="28800" to="144000"/>
+      <change idref="t17" attribute="internalAssignments" type="string" from="" to="2"/>
+      <change idref="t17" attribute="internalPrerequisitesString" type="string" to="16FS"/>
+      <change idref="t17" attribute="resourceLeveledDate" type="date" to="2019-09-09T17:00:00.000Z"/>
+      <change idref="t17" attribute="styleDict" type="dict" to="{&#10;    &quot;gantt-fill-color&quot; =     {&#10;        b = &quot;0.566152&quot;;&#10;        g = &quot;0.803&quot;;&#10;        r = &quot;0.440847&quot;;&#10;        space = srgb;&#10;    };&#10;}"/>
+      <change idref="t17" attribute="title" type="string" to="Formal Method Eval"/>
+    </change>
+    <change idref="t18" to="t2" to-position="3" resolved="yes">
+      <change idref="t18" attribute="effort" type="real" from="28800" to="576000"/>
+      <change idref="t18" attribute="internalAssignments" type="string" from="" to="4; 5"/>
+      <change idref="t18" attribute="internalPrerequisitesString" type="string" to="15FS, 16FS, 17FS"/>
+      <change idref="t18" attribute="resourceLeveledDate" type="date" to="2019-09-16T17:00:00.000Z"/>
+      <change idref="t18" attribute="title" type="string" to="Implementation"/>
+    </change>
+  </task-change-set>
+  <resource-change-set user="Laurent Michel" date="2019-07-22T15:59:01.420Z" timestamp="2019-07-22T15:59:01.420Z">
+    <change idref="r2" to="r-1" to-position="1" resolved="yes">
+      <change idref="r2" attribute="name" type="string" from="" to="Amir"/>
+    </change>
+    <change idref="r3" to="r-1" to-position="2" resolved="yes">
+      <change idref="r3" attribute="name" type="string" from="" to="Laurent"/>
+    </change>
+    <change idref="r4" to="r-1" to-position="3" resolved="yes">
+      <change idref="r4" attribute="name" type="string" from="" to="Alex"/>
+    </change>
+    <change idref="r5" to="r-1" to-position="4" resolved="yes">
+      <change idref="r5" attribute="name" type="string" from="" to="Chris"/>
+    </change>
+    <change idref="r1" attribute="name" type="string" from="Resource 1" to="Ahmad" resolved="yes"/>
+  </resource-change-set>
+  <metadata-change-set user="Laurent Michel" date="2019-07-22T15:59:01.420Z" timestamp="2019-07-22T15:59:01.420Z">
+    <change idref="m1" attribute="fixedDate" type="date" from="2007-01-01T20:00:00.000Z" to="2019-07-22T12:00:00.000Z" resolved="yes"/>
+    <change idref="m1" attribute="currencyName" type="string" to="$1,234.56" resolved="yes"/>
+  </metadata-change-set>
+</changelog>

@@ -1,0 +1,97 @@
+#+TITLE:     Update
+#+AUTHOR:    A. Jbara, L. Michel, A. Herzberg
+#+EMAIL:     ldm@engr.uconn.edu
+#+DATE: \today
+#+DESCRIPTION:
+#+KEYWORDS:
+#+BEAMER_THEME: Berlin
+#+BEAMER_COLOR_THEME: beaver
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:
+#+LINK_HOME:
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{comcast.png}}
+#+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
+
+#+name: setup-minted
+#+begin_src emacs-lisp :exports none
+ (setq org-latex-listings 'minted)
+     (setq org-latex-custom-lang-environments
+           '(
+            (emacs-lisp "common-lispcode")
+             ))
+     (setq org-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+     (setq org-latex-to-pdf-process
+           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+
+* LGTM
+*** LGTM CVEs
+	- 114 listed CVEs discovered
+	- Most are stack overflow, memory bound, DoS
+	- CVE-2019-5413 (JS Command Injection)
+*** LGTM Code Analysis
+1. Checkout source code for analysis
+2. Generate a database of this codebase (AST, CFG, DFG)
+3. Run queries on the database, generate alerts
+*** CodeQL
+	- Implemented in CodeQL
+	- Declarative, object-oriented query language
+	- On Database representing software artifacts
+*** Variant Analysis
+	- Using known vulnerability as seed for detection engine
+	- Techniques: Control flow analysis (CFA), data flow analysis (DFA), taint tracking, bounds analysis, semantic code search
+*** Limitations
+	- No way of seeing all alerts of a specific type, we must filter manually
+	- However, possible to see all the alerts in a specific commit
+	- Adding a commit hash to CVE database for each version listed
+	- API (https://lgtm.com/help/lgtm/api/api-v1#LGTM-API-specification-Analyses)
+	- CLI (https://help.semmle.com/codeql/codeql-cli.html)
+* OSC Benchmark
+
+*** Test Cases
+	- Each test case has a single, intentional CWE, a True Positive or a False Positive
+	- Results will be compared to an expected results file to determine their score
+*** Outcomes
+	4 results that measure accuracy
+	- True Positive: Real vulnerabilities, correctly reported
+	- False Negative: Real vulnerabilities, not correctly reported
+	- True Negative: Tests fake vulnerabilities, correctly not reported .
+	- False Positive: Fake vulnerabilities, incorrectly reported.
+*** Scoring: 
+	The Benchmark Accuracy Score (Youden Index)
+ 	- Accuracy: True Positive $Rate(TPR) = \frac{TP}{(TP + FN)}$
+ 	- Precision or Sensitivity: False Positive $Rate(FPR) = \frac{FP}{(FP + TN)}$
+ 	- Specificity: Normalized Distance From Guessing $Line = TPR - FPR$
+ 	- Ranged 0-100
+*** OWASP's Note on Validity
+ 	"To be clear, the Benchmark tests are not exactly like real
+ 	applications. The tests are derived from coding patterns
+ 	observed in real applications, but the majority of them are
+ 	considerably simpler than real applications. That is, most
+ 	real world applications will be considerably harder to
+ 	successfully analyze than the OWASP Benchmark Test
+ 	Suite. Although the tests are based on real code, it is
+ 	possible that some tests may have coding patterns that don’t
+ 	occur frequently in real code."
+ 	(https://owasp.org/www-project-benchmark/) 
+*** JavaScript Benchmark
+	- Built with synthetic examples
+	- One true or false positive per test
+	- Use relevant CVEs for variant analysis 
+	- Generate deeper synthetic example (un-witnessed) from code obfuscation
+* Questions and Comments?
+*** Questions?

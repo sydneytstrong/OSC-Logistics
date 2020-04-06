@@ -1,0 +1,235 @@
+#+TITLE:     Update
+#+AUTHOR:    A. Jbara, L. Michel, A. Herzberg
+#+EMAIL:     ldm@engr.uconn.edu
+#+DATE: \today
+#+DESCRIPTION:
+#+KEYWORDS:
+#+BEAMER_THEME: Berlin
+#+BEAMER_COLOR_THEME: beaver
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:
+#+LINK_HOME:
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{comcast.png}}
+#+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
+
+#+name: setup-minted
+#+begin_src emacs-lisp :exports none
+ (setq org-latex-listings 'minted)
+     (setq org-latex-custom-lang-environments
+           '(
+            (emacs-lisp "common-lispcode")
+             ))
+     (setq org-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+     (setq org-latex-to-pdf-process
+           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+* Overview
+- L1 & L2 Findings
+- Analysis Pipeline Process
+- Testing platform Update
+- Results
+
+
+* Tool Findings
+*** Details
+:PROPERTIES:
+:BEAMER_opt: shrink=35
+:END:
+| Package           |    Version | API                            | file location                                                                                                   | Status  | C/S |
+|-------------------+------------+--------------------------------+-----------------------------------------------------------------------------------------------------------------+---------+-----|
+| Depot             |      0.1.6 |                                | /specs/vendor/mocha.js [521]                                                                                    | FP      |     |
+| Depot             |      0.1.6 | assert.operator()              | /specs/vendor/chai.js [2333]                                                                                    | TP      | S   |
+| Jade              |     1.11.0 | isExpression()                 | /jade.js [78]                                                                                                   | FP      | S   |
+| Jade              |     1.11.0 | parseObj()                     | /bin/jade.js [4510]                                                                                             | TP      | S   |
+| Prototype(npm)    |      0.0.5 | evalScripts()                  | /lib/String.js [100]                                                                                            | TP      | S   |
+| PrototypeJS       |      1.7.3 | evalScripts(), replace, update | /src/prototype/lang/String.js                                                                                   | TP      | C   |
+| PrototypeJS       |      1.7.3 | evalResponse()                 | /src/prototype/ajax/request.js [348]                                                                            | level 1 | C   |
+| Backbone          |      1.4.0 | addMethod()                    | /backbone.js                                                                                                    | level 1 | C   |
+| Backbone          |      1.4.0 | ~~                             | /backbone.js [1059,1999]                                                                                        | FP      |     |
+| @ember            |      1.0.3 |                                | /workerpool/dist/worker.js [104]                                                                                | level 1 |     |
+| @ember            |      1.0.3 |                                | /workerpool/dist/workerpool.js [1381]                                                                           | level 1 |     |
+| @ember            |      1.0.3 |                                | /workerpool/lib/worker.js [58]                                                                                  | level 1 |     |
+| ansi-to-html      |     0.6.11 |                                | /test/cli.js [31]                                                                                               | level 1 |     |
+| babel-types       |     6.26.0 |                                | /node_modules/to-fast-properties/index.js [10]                                                                  | level 1 |     |
+| Bean              |     1.0.15 |                                | /tests/support/syn/mouse.js [38,40]                                                                             | level 1 |     |
+| Constantinople    |      3.1.2 |                                | /index.js [94]                                                                                                  | level 1 |     |
+| jquery-ui         |      1.0.0 |                                | /external/requires [2071]                                                                                       | level 1 |     |
+| Transformers      |            |                                | /lib/transformers.js                                                                                            | level 1 |     |
+| Vis               |     4.21.0 |                                | /examples/graph3d/playground/playground.js [386]                                                                | level 1 |     |
+| Vis               |     4.21.0 |                                | /examples/timeline/other/requirejs/scripts/require.js [35]                                                      | level 1 |     |
+| Alt               |     0.18.6 | ~~                             | /dist/alt.js [30]                                                                                               | level 1 |     |
+| Angular           |      1.7.8 | ~~                             | /angular.js [5030,19648,19720,6372,6376,6630,11382,13976,16930,16941,16964,17449,22787,30768,31072,34148,34365] | FP      |     |
+| Angular-mocks     |      1.7.8 | ~~                             | /angular-mocks.js [1103,2126,2137]                                                                              | FP      |     |
+| Angular-resources |      1.7.8 | ~~                             | /angular-resources.js [898]                                                                                     | level 1 |     |
+| Director          |      1.2.8 | ~~                             | /build/director.js [519,338]                                                                                    | level 1 |     |
+| Director          |      1.2.8 | ~~                             | /build/director.js [58]                                                                                         | FP      |     |
+| Director          |      1.2.8 | ~~                             | /lib/director/browser.js [49]                                                                                   | FP      |     |
+| Director          |      1.2.8 | ~~                             | /lib/director/http/index.js [144]                                                                               | FP      |     |
+| Director          |      1.2.8 | ~~                             | /lib/director/router.js [451,81]                                                                                | level 1 |     |
+| Flot              | 3.2.5 (!C) | ~~                             | /source/jquery.flot.js [370]                                                                                    | FP      |     |
+| Flot              | 3.2.5 (!C) | ~~                             | /source/jquery.flot.hover.js [289]                                                                              | FP      |     |
+| Flot              | 3.2.5 (!C) | ~~                             | /source/jquery.flot.time.js [174]                                                                               | FP      |     |
+| Flot              | 3.2.5 (!C) | ~~                             | /source/jquery.flot.touch.js [62, 65, 71, 74]                                                                   | FP      |     |
+| Flot              | 3.2.5 (!C) | ~~                             | /lib/jquery.event.drag.js [141]                                                                                 | FP      |     |
+| Flot              | 3.2.5 (!C) | ~~                             | /lib/globalize.js [380]                                                                                         | FP      |     |
+| mocha             |      6.2.0 | ~~                             | /mocha.js [1,10860,8405,15613]                                                                                  | FP      |     |
+| mocha             |      6.2.0 | ~~                             | /mocha.js [12571,12761,12771,12781,12792,]                                                                      | FP      |     |
+| mocha             |      6.2.0 | ~~                             | /lib/cli/run.js [255]                                                                                           | FP      |     |
+| Pako              |     1.0.10 | ~~                             | /dist/pako.js [649]                                                                                             | FP      |     |
+| Pako              |     1.0.10 | ~~                             | /dist/pako_deflate.js [649]                                                                                     | FP      |     |
+| Pako              |     1.0.10 | ~~                             | /dist/pako_inflate.js [649]                                                                                     | FP      |     |
+| Should            |     13.2.3 | ~~                             | /as-function.js, /cjs/should.js, /es6/should.js [387/387/383]                                                   | FP      |     |
+| Should            |     13.2.3 | ~~                             | /should.js [157]                                                                                                | level 1 |     |
+| Should            |     13.2.3 | ~~                             | /should.js [1788,2898]                                                                                          | FP      |     |
+| Sizzle            |      2.3.4 | ~~                             | /dist/sizzle.js [1549,1682,1788,1989,2144]                                                                      | FP      |     |
+
+
+* L1s:
+*** L1s
+:PROPERTIES:
+:BEAMER_opt: shrink=35
+:END:
+
+|         Package         |          Path/to/File [line_number]           |  Determination  | Time spent on L1 |
+|-------------------------+-----------------------------------------------+-----------------+------------------|
+|       Alt-0.18.6        |               /dist/alt.js [30]               | False Positive  |       15m        |
+| Angular-resource-1.7.8  |          /angular-resources.js [898]          |     Level 2     |       20m        |
+|     Backbone-1.4.0      |     /backbone.js [1463, 1466, 1469, 1474]     |     Level 2     |       30m        |
+|       Depot-0.1.6       |         /specs/vendor/mocha.js [521]          | Pseudo Positive |        5m        |
+|     Director-1.2.8      |           /build/director.js [519]            |     Level 2     |       30m        |
+|     Director-1.2.8      |           /build/director.js [338]            | False Positive  |       25m        |
+|     Director-1.2.8      |         /lib/director/router.js [81]          | False Positive  |        5m        |
+|     Director-1.2.8      |         /lib/director/router.js [451]         |     Level 2     |        5m        |
+|       Flot-3.2.5*       |         /source/jquery.flot.js [370]          |     Level 2     |       30m        |
+|       Mocha-6.2.0       | /mocha.js [12751, 12761, 12771, 12781, 12792] | Pseudo Positive |       30m        |
+| Twitter-bootstrap-2.1.1 |   /docs/assests/js/bootstrap-alert.js [76]    | False Positive  |       15m        |
+| Twitter-bootstrap-2.1.1 | /docs/assests/js/bootstrap-dropdown.js [131]  | False Positive  |       15m        |
+| Twitter-bootstrap-2.1.1 |   /docs/assests/js/bootstrap.js [135, 706]    | False Positive  |       15m        |
+
+
+* L2s to completion:
+*** L2s
+:PROPERTIES:
+:BEAMER_opt: shrink=35
+:END:
+
+|        Package         |      Path/to/File [line_number]       | Determination | Time spent on L2 (min) |
+|------------------------+---------------------------------------+---------------+------------------------|
+| Angular-resource-1.7.8 |      /angular-resources.js [898]      |      FP       |           45           |
+|     Backbone-1.4.0     | /backbone.js [1463, 1466, 1469, 1474] |      FP       |           15           |
+|     Director-1.2.8     |       /build/director.js [519]        |      FP       |           80           |
+|     Director-1.2.8     |     /lib/director/router.js [451]     |      FP       |           30           |
+|      Flot-3.2.5*       |     /source/jquery.flot.js [370]      |      FP       |           60           |
+
+* Angular - It calls a put/get/pull method, wouldn't be able to inject anything here (predetermined values, anything else wouldn't make sense)
+*  Backbone - Level 4ish, predetermined values. Could not inject our own method
+*  Director - Router.prototype.invoke() seemed exploitable, but it isn't a top level api. I tried and wasn't able to invoke any malicious functions (exploded)
+*  Router- never executes arguments, always ran on an empty array. (Predetermined values for what the methods would be)
+* Flot - Executehooks seemed exploitable, but the data being passed was always sanitized and/or predetermined (exploded)
+
+* Analysis Pipeline Process(new)
+
+*** Download and Extract CVE Sources(new)
+- Working version completed
+- Downloads & extracts relevant source releases per CVE
+- Categorizes them by reported state (safe, vulnerable, etc.) and CWE
+
+*** Run Finder on Sources(new)
+- Working version completed
+- Ongoing improvement as part of workflow
+- Runs existing finder on downloaded sources
+
+*** Analyze Finder Output(new)
+- Still in development
+- Take finder output and compare sink findings of CVE package across versions
+- ie. Sink present at line X in last vulnerable version, same sink missing in first safe version...
+- Point out to developer where sinks are being detected/'disappearing'
+- Also create file diff between versions for easy analysis of these areas
+
+
+*** Histogram of CVE obtained on Opensource DB
+[[file: HistogramOverDB_v2.png]]
+
+*** Histogram of CVE obtained on Opensource DB continued
+- Red: CVEs that have been looked through
+- Orange: CVEs that are suspected to be a generalization of multiple vulnerabilities
+- Blue: Others
+
+*** Recalling the Purpose of the Tool Extension
+- Verify that the Sink Finder tool is reliable in finding other documented vulnerabilities.
+- Make the manual testing process an automated one.
+- Track the progression of sinks across repository versions.
+- Higher volume of test cases.
+- Facilitates easier tool modification.
+
+* Tool Extension Improvement: obtaining data
+	- Harvested information from multiple data sources(Circl, NIST, SourceClear)
+  - Collected packages in their vulnerable and nonvulnerable builds
+
+
+*** Process procedure: Data Gathering Platform
+- Obtain package data by running our created scrubbers for different online DB.
+- include various different builds and installatation information.
+
+
+*** Process procedure: Testing Platform
+- Reads data generated from the Data Gathering Platform
+- Installs the Package
+- Runs the Sink Finder
+- Validates Sink Finder results & logs results into DB
+
+
+*** Testing Platform Update (NEW)
+- Developed a platform that downloads CVE from our internal Database.
+- Automated the process for testing the sink finder on these CVE entries
+- Assembled a platform that executes these two processes
+
+
+*** Package Analysis
+- Of the packages that were obtained, we would like to focus on
+- Postgre
+- pouchdb
+- Syntax-error
+- Shell-quote
+- summit
+
+*** Testing Platform Demo
+- Showing Demo
+
+*** Package: postgres
+[[file:postgres.pdf]]
+
+*** Package: pouchdb
+[[file:pouchdb.pdf]]
+
+*** Package: syntax-error
+[[file:pouchdb.pdf]]
+
+*** Package: shell-quote
+[[file:shell-quote.pdf]]
+
+*** Package: summit
+[[file:summit.pdf]]
+
+*** The Next Steps (NEW)
+- Analyize the results of the testing Platform
+- See diffs between versions in our CVE entries
+- Make statistics of the tools performance
+- Move forward with recognizing new patterns of vulnerable code constructions.
+
+
+*** Questions?

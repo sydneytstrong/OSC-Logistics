@@ -1,0 +1,1 @@
+to open sql in the terminal: sudo mysql -u root

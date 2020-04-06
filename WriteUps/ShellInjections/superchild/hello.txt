@@ -1,0 +1,5 @@
+Hello World!
+This is a test
+
+To lock down my computer, input the command:
+/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend

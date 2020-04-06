@@ -1,0 +1,388 @@
+#+TITLE:     Initial Results of Template Finder 
+#+AUTHOR:    A. Jbara, L. Michel, A. Herzberg
+#+EMAIL:     ldm@engr.uconn.edu
+#+DATE: \today      
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+BEAMER_THEME: Berlin
+#+BEAMER_COLOR_THEME: beaver
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME:
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{comcast.png}}
+#+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
+
+
+#+name: setup-minted
+#+begin_src emacs-lisp :exports none
+ (setq org-latex-listings 'minted)
+     (setq org-latex-custom-lang-environments
+           '(
+            (emacs-lisp "common-lispcode")
+             ))
+     (setq org-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+     (setq org-latex-to-pdf-process
+           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+*  Purpose
+*** Punch line
+
+Preliminary results: we found...
+1. One false positive in your 50
+2. Three true positive in your 50 
+3. List of potentials to investigate
+4. Opportunities to enhance the tool
+5. Two true positive from the short list of "5"
+
+#+LaTeX:\begin{exampleblock}{Caution}
+These are specifically for ~JS~ code injection
+#+LaTeX:\end{exampleblock}
+
+*** The challenge
+- Catch all possible usages of dangerous APIs.
+- The underlying language is **dynamic**.
+*** Overall methodology
+- Step 1:  Define sink search patterns [not CF, not regular]
+   - Grep/ack/...  : many false positives / negatives
+- Step 2: Implement search tool
+   - APIs: eval, exec, execSync,...
+   - Eval on synthetic examples
+- Step 3: Evaluate on OSC collection
+   - Uncover unexpected patterns
+   - Improve tool with known vulnerabilities from public DBs
+   - Iterate to step 1
+- Step 4: Deploy on Comcast(50)   [concurrently with step 3]
+   - **Manually** validate the leads
+
+*  Vulnerabilities of interest
+*** Injections
+- Code injection (eval/Function)
+   - This is where we focused manual analysis
+- Command injection (exec)
+- SQL injection
+
+*** What is Hard with ``Sinks''
+- Javascript is highly dynamic
+   - Runtime evaluations
+- JS Programmers
+   - They sometimes write truly obscure code
+   - They sometimes try to conceal what they do
+- Example : Function calls
+   - Can be **direct**  or **indirect**
+   - Can affect **local** or **global** scope
+*** Direct =eval=
+- Code is executed in the scope of the caller
+- Global  scope is not allowed
+#+name: eval-listing
+#+begin_src  js :exports code
+eval(string)
+#+end_src
+
+*** Indirect =eval=
+- A /few/ examples
+
+#+name: eval-listing
+#+begin_src  js :exports code
+(1, eval)(string)
+this.eval(string)
+this['eval'](string)
+eval.call(this, string)
+eval.apply(this, array)
+[eval][0](string)
+eval('eval')(string)
+var e = eval;  e(string)
+#+end_src
+
+*** Examples of ``Weird'' in Comcast(50)
+- Offending Packages
+    1. vis
+    2. jQuery. 
+*** Obfuscation  **vis-4.2.1.0**
+File: vis-4.2.1.0/package/dist/vis.js
+#+begin_src  js :exports code
+g = g || Function("return this")() || (1,eval)("this");
+#+end_src
+
+*** Obscure 
+From **flot/jQuery** 
+- flot/source/jquery.js:559
+
+#+begin_src  js :exports code
+globalEval: function( data ) {
+        if ( data && core_rnotwhite.test( data ) ) {
+                // We use execScript on Internet Explorer
+                // We use an anonymous function so that context is window
+                // rather than jQuery in Firefox
+                ( window.execScript || function( data ) {
+                        window[ "eval" ].call( window, data );
+                } )( data );
+        }
+},
+#+end_src
+
+*** Just imagine...
+- A variant that is even worse **i.e., intractable**...
+   - Name of property is computed at runtime
+   - Leads to /false negatives/
+
+#+begin_src js :exports code
+object = this;
+object["eval"].call("2+2");
+const F = "ev";
+const U = "al";
+object[F+U].call([],"2+2");
+#+end_src
+
+*  Findings
+*** On Comcast(50) and Manual results so far
+\label{listbad}
+#+LaTeX:{\footnotesize
+- @ember/.../workerpool/dist/worker.js [104]
+- @ember/.../workerpool/dist/workerpool.js [1381]
+- @ember/.../workerpool/lib/worker.js [58]
+- ansi-to-html/test/cli.js [31]
+- babel-types/node_modules/to-fast-properties/index.js [10]
+- Bean/tests/support/syn/mouse.js [38,40]
+- Constantinople/index.js [94]
+- Depot/specs/vendor/chai.js [2333]
+- Jade/bin/jade.js [78,4510]
+- jquery-ui/external/requires [2071]
+- Prototype/lib/String.js [100,201]
+- Transformers/lib/transformers.js [319]
+- Vis/examples/graph3d/playground/playground.js [386]
+- vis/examples/timeline/other/requirejs/scripts/require.js [35]
+#+LaTeX:}
+
+*** Note
+#+LaTeX: \begin{exampleblock}{Caveat}
+Some are in ~example~ (or test) directories
+- =ansi-to-html/test/cli.js=
+- =Bean/.../mouse.js=
+- =vis/.../playground.js=
+- =vis/.../require.js=
+#+LaTeX:\end{exampleblock}  
+
+*** Dependencies
+What we observed
+- Two kind of dependencies
+   - Explicit via NPM
+   - Embedded (specific version)
+- Example
+   - `Workerpool` is embedded in several from Comcast(50)
+Project scope
+- Does **not include analysis of dependencies**
+- Yet we did some embedded dependencies too
+
+*** Manual Analysis results
+Three kinds
+ - False positive
+ - True positive
+ - Leads
+
+*** Lead **false positive**
+File ~jade-1.11.0/package/jade.js:4508~
+#+begin_src js :exports code
+function isExpression(src) {
+  try {
+    eval('throw "STOP"; (function () { return (' + src + '); })()');
+    return false;
+  }
+  catch (err) {
+    return err === 'STOP';
+  }
+}
+#+end_src
+
+*** Lead is a **false positive** Why?
+#+begin_src js :exports code
+function isExpression(src) {
+  try {
+    eval('throw "STOP"; (function () { return (' + src + '); })()');
+    return false;
+  } catch (err) {
+    return err === 'STOP';
+  }
+}
+#+end_src
+1. ~eval~ throws an exception if  ~src~ is not syntactically sound
+2. If ~src~ **is an expression**, no syntax error!
+   - and therefore ~eval~ evaluates the block
+   - which ~throws~ a string exception immediately
+   - that is caught by the ~catch~ and checked against ~STOP~
+3. If ~src~ **is not an expression**, syntax error!
+   - a syntax error is ~thrown~ by ~eval~
+   - it is caught by the ~catch~
+   - and is not ~STOP~, so ~isExpression~ returns ~false~
+*** Lead is a **true positive** 
+:PROPERTIES:
+:BEAMER_opt: shrink=5
+:END:
+- Package ~depot-0.1.6~
+- File ~depot/specs/vendor/chai.js:2329~
+#+begin_src js :exports code
+     assert.operator = function (val, operator, val2, msg) {
+        if (!~['==', '===', '>', '>=', '<', '<=', '!=', '!=='].indexOf(operator)) {
+          throw new Error('Invalid operator "' + operator + '"');
+        }
+        var test = new Assertion(eval(val + operator + val2), msg);
+        test.assert(
+            true === flag(test, 'object')
+          , 'expected ' + util.inspect(val) + ' to be ' + operator 
+                        + ' ' + util.inspect(val2)
+          , 'expected ' + util.inspect(val) + ' to not be ' + operator 
+                        + ' ' + util.inspect(val2) );
+      };
+#+end_src
+*** Lead is a **true positive**  Why?
+#+begin_src js :exports code
+        var test = new Assertion(eval(val + operator + val2), msg);
+#+end_src
+1. ~operator~ is checked (safe!)
+2. Neither ~val~ nor ~val2~ are validated. 
+3. Therefore...
+   - One can pass a malicious payload in either ~val~ or ~val2~
+   - Payload is an expression (can be a function call). 
+#+begin_src js :exports code
+var assert = require('depot/specs/vendor/chai').assert
+assert.operator(/*vulnerable assertion here --payload in operands--*/)
+#+end_src
+4. Caveat
+   - the ~require~ goes against the embedded dependencies
+   - the current ~Chai~ version is safe
+*** Demo
+#+LaTeX: \begin{alertblock}{Alert}
+Watch the **demo!**
+#+LaTeX:\end{alertblock}  
+
+*** Lead is a **true positive**
+:PROPERTIES:
+:BEAMER_opt: shrink=10
+:END:
+- Package: ~jade-1.11.0~
+- File: ~jade/bin/jade.js:73~
+
+#+BEGIN_SRC js :exports code
+if (program.obj) {
+  options = parseObj(program.obj);
+}
+
+function parseObj (input) {
+  var str, out;
+  try {
+    str = fs.readFileSync(program.obj);
+  } catch (e) {
+    return eval('(' + program.obj + ')');
+  }
+  // We don't want to catch exceptions thrown in JSON.parse() so have to
+  // use this two-step approach.
+  return JSON.parse(str);
+}
+#+END_SRC
+*** Explanation
+Demo of payload to CLI command
+- Argument /should/ be a filename
+- But what if you feed a =JS= fragment?
+[[file:payload-jade.png]]
+What happens...
+- CLI Arguments are placed into ~program.obj~
+- That is fed to ~parseObj~
+- ~fs.readFileSync~ throws an error
+- The ~catch~ feeds the program name to ~eval~!
+Caveat: this is a command line utility
+*** Lead to investigate
+:PROPERTIES:
+:BEAMER_opt: shrink=5
+:END:
+- Package: ~jade-1.11.0~
+- File: ~jade/jade.js:73~
+
+#+BEGIN_SRC js :exports code
+isConstant.toConstant = toConstant;
+function toConstant(src, constants) {
+  if (!isConstant(src, constants)) throw new Error(JSON.stringify(src) + ' is not constant.');
+    return Function(Object.keys(constants || {}).join(','), 'return (' + src + ')').
+	  apply(null, Object.keys(constants || {}).map(
+		    function (key) { return constants[key];})
+	       );
+}
+#+END_SRC
+This creates a ~Function~ object (actual =JS= function)
+- code body based on ~src~
+- body ~src~ is supposed to be an expression (passed to return)
+- function is called immediately with ~apply~
+
+*** Lead is a **true positive** 
+:PROPERTIES:
+:BEAMER_opt: shrink=10
+:END:
+- Package ~prototype-0.0.5~
+- File ~prototype/lib/String.js:99~
+#+BEGIN_SRC js :exports code
+function extractScripts() {
+  var matchAll = new RegExp(Prototype.ScriptFragment, 'img'),
+      matchOne = new RegExp(Prototype.ScriptFragment, 'im');
+  return (this.match(matchAll) || []).map(function(scriptTag) {
+    return (scriptTag.match(matchOne) || ['', ''])[1];
+  });
+}
+function evalScripts() {
+  return this.extractScripts().map(function(script) { return eval(script) });
+}
+#+END_SRC
+~evalScripts~ invoke ~extractScript~ on its receiver to get a list
+- It  ~eval~ each script in the list: **without  validation/verification**
+*** Demo
+#+LaTeX: \begin{alertblock}{Alert}
+Watch the **demo!**
+#+LaTeX:\end{alertblock}  
+*** Lead to investigate
+:PROPERTIES:
+:BEAMER_opt: shrink=10
+:END:
+- Package ~prototype-0.0.5~
+- File ~prototype/lib/String.js:192~
+#+BEGIN_SRC js :exports code
+function evalJSON(sanitize) {
+  var json = this.unfilterJSON(),cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+  if (cx.test(json)) {
+    json = json.replace(cx, function (a) {
+	return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+    });
+  }
+  try { if (!sanitize || json.isJSON()) return eval('(' + json + ')'); } 
+  catch (e) { }
+  throw new SyntaxError('Badly formed JSON string: ' + this.inspect());
+}
+#+END_SRC
+To check
+- Semantics of ~cx~ unclear
+- When ~sanitize=false~, it calls ~eval~ on ~json~
+- ~json~ is derived from call ~unfilterJSON~ on receiver
+
+*  Discussion
+*** Leads found to date
+- In Comcast(50)
+   - JADE (4 leads), (1 true +) [more: see slide \ref{listbad}]
+- In the short list of 5 
+   - Prototype
+   - Depot/Chai (embedded dependency)
+
+Questions
+- Where do we focus for further manual ? 
+- What to do with embedded dependencies ?
+- Priority list of 50 vs. list of 5 ? 
+

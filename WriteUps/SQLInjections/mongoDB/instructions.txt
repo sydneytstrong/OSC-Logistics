@@ -1,0 +1,1 @@
+to open mongo db in the terminal: mongo

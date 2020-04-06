@@ -1,0 +1,107 @@
+#+Slide0
+	Title slide
+		names
+#+End_slide0
+
+#+Slide1
+	Overview
+		* Current Findings
+		* Automating Improvement
+		* What's The Next Step
+#+End_slide1
+
+#+Slide2
+	# Current Findings
+	Patterns the tool is searching for:
+	* ` eval()`
+	* `obj[var].call()`
+	* `obj[var].apply()`
+	* `obj[var] ()`
+
+	# Packages Breakdown
+	| Total # of Packages | Sink Finder Results               | Percentage                          |
+	| ------------------- | --------------------------------- | ----------------------------------- |
+	| 50                  | 15 (+7 external dependencies)     | 22% (44% incl. additional packages) |
+#+End_slide2
+
+#+Slide3
+	# File Breakdown
+	| True Positives | Level 1 Interests | False Positives | Total # of Files |
+	| :------------: | :---------------: | :-------------: | :--------------: |
+	|     4 (1%)     |     18 (49%)      |    22 (50%)     |        44        |
+
+	### Example of a common false positive
+	```javascript
+	this.history[options.replace ? 'replaceState' : 'pushState']({}, document.title, url);
+	```
+
+	Easy to eliminate because the attribute that history calls can only be one of two literals.
+
+#+End_Slide3
+
+#+slide4
+	# Retrospective:
+		* Method is informative, but slow (manual).
+		* Automation will save time and provide more metrics.
+#+End_slide4
+
+#+Slide5
+	# Sink Finder Tool Extension:
+		* Tool currently searches local sources and reports sinks.
+		* A database should be used to contain logistic, installation, and testing data.
+		* Tool can then cross-reference across runs for more comprehensive data.
+#+End_slide5
+
+#+Slide6
+	Purpose of Extension:
+	  * Verify that the tool is reliable in finding other documented vulnerabilities.
+		* Make the manual testing process an automated one.
+		* Track the progression of sinks across repository versions.
+#+End_slide6
+
+#+Slide7
+	Automation Benefits:
+		* Enhance speed and efficiency of future development.
+		* Higher volume of test cases.
+		* Facilitates easier tool modification.
+		* Simplifies integration of our system.
+#+End_slide7
+
+#+Slide8
+	Process procedure:
+		* Obtain the information for packages containing a specific vulnerability from online DBs.
+		* Run main tool on the known exploitable packages, then assess if vulnerabilities were found.
+		* Evaluate/improve tool search pattern for vulnerability type based on findings from previous step.
+#+End_slide8
+
+#+Slide9
+	Visualization Of Process
+	[[./images/OSC-UConn-ToolExtension1-Obtaining.png]]
+#+End_slide9
+
+#+Slide10
+	Visualization Of Testing
+	[[./images/OSC-UConn-ToolExtension2-Testing.png]]
+#+End_slide10
+
+#+Slide11
+	Testing demo, testing results
+#+End_slide11
+
+#+Slide12
+	#Next Steps for Scrubber Tool
+		* interface with more databases for more test cases
+		* Expand filtering for more vulnerabilities
+		* Gather Statistics of tool performance
+#+End_slide12
+
+#+Slide13
+	Next Steps for Sink Tool finder
+		* Use results from scrubber to find more sinks and reduce false positives.
+		* Improve SQL and command injection patterns.
+		* Verify the tool doesn't miss any patterns.
+#+End_slide13
+
+#+Slide14
+	Questions and Comments?
+#+End_slide14
