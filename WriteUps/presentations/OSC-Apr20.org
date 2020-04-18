@@ -137,8 +137,14 @@
 - Updating score card script to run the tool (LGTM) and use results to generate scorecard
 - Adjusting benchmarks so they reflect library vulnerabilities instead of developer side APIs
 * Submitting our Findings
-***
-
+*** CVE-ID Registration
+- Learned the process for submitting a CVE-ID request & created a template for said process
+- Collected data necessary to make CVE-ID requests for the following packages:
+ - Jade
+ - Depot
+ - PrototypeJS
+- CNA (CVE Numbering Authority) for all three packages is Nodejs
+- All information gathered has been submitted to team for review
 * Paper
 *** Paper Proposals
 -On hold, James is away due to the pandemic.
