@@ -128,7 +128,7 @@
  [[./ExplainationQueryV2.png]]
 
  *** LGTM Results 
- [[./csvQueriesResult.png]]
+ [[./figures/csvQueriesResult.png]]
  - We are able to locate sinks using CodeQL.
 
  
