@@ -70,9 +70,7 @@
 
 *** Moving Forward
  - Bigram Analysis seems more precise, but yeilds fewer results.
- - Continue manual analysis of high scoring CVE.
- - Determine set of distinquishing terms.
- - Distinguishing terms = Common in sample, uncommon in random sample
+ - Continue manual analysis of high scoring CVEs from monogram (one-word term) analysis.
  - Weighting for distiguishing terms.
 
 
