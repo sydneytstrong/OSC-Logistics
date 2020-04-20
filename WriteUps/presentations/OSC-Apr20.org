@@ -42,7 +42,6 @@
 - Generated frequency distributions over 34 injection CVE
 - Manually decided relevant terms via ranking by highest frequency
 - Scored relevancy of rest of database by occurence of these terms
-[[./figures/stem.png]]
 
 *** Results From Last Time
 - Many entries scored highly, suggesting relevant terms were not specific enough
