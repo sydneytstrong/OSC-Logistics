@@ -168,10 +168,6 @@
 - CNA (CVE Numbering Authority) for all three packages is Nodejs
 - All information gathered has been submitted to team for review
 
-* Paper
-*** Paper Proposals
--On hold, James is away due to the pandemic.
-
 * Summary
 *** What We Have Done So Far
 - Evaluating sorted list of CVEs by relevance
