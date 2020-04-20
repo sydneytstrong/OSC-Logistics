@@ -38,90 +38,109 @@
 #+end_src
 
 * CVE Classification
-; *** Natural Language Processing (NLTK)
-; - Python framework for processing language data
-; - Tested NLP ML library - Bayes Classifier
-; - Tested 3000 training points, 75% accuracy
-; - Limited training data ~40 CVEs
-; - We are using NLP frequency analysis
-; *** Frequency Analysis
-; - Generated frequency distributions over 34 injection CVE
-; - Normalization: eliminate symbols, lingustic stemming, remove stopwords
-; - Glossary of terms: code, execut, arbitrari, inject, command, sqlite,
-;   shell, sequel, sql, waterlin, postgr, mysql
-; #+ATTR_LATEX: :width 5cm
-; [[./stem.png]]
-; *** Sample Set Frequency
-; #+ATTR_LATEX: :width 6cm
-; [[./sampleFreq.png]]
-; - 34 Javacript CVEs
-; - CWE-77 Command Injection, CWE-78 OS Command Injection, CWE-89 SQL
-;   Injection, CWE-94 Code Injection
-; *** Frequency Results
-; - 537 JavaScript CVEs
-; - Likely relevant:
-;     - CWE-200 Information Exposure,
-;     - CWE-20 Improper Input Validation,
-;     - CWE-74 Injection
-; - Included: CWE-22,310,79,400,399,254
-; *** Detailed Table
-; #+ATTR_LATEX: :width 9cm
-; [[./freq_res.png]]
-; *** Test Set Frequency
-; [[./testFreq.png]]
-; *** Injection (CWE-74)
-; - Command, data structure, or record with externally-influenced input.
-; - Nine JS CVE under CWE-74 classification
-; - Ex. CVE-2019-5479, larvitbase-api
-;     - Provides a new signature.
-;     - Code injection that relies on a dynamic require(), vulnerable to local file inclusion.
-; - All nine were added to our sample set.
-; *** Relevant CVE Analysis
-; CVE-2016-10548 - Under CWE-94 (XSS)
-; - Very relevant - 4 most relevant terms
-; - Versions of reduce-css-calc pass input directly to eval.
-; - Already covered signature.
-; - If input is passed to the calc function it can lead to remote code execution on the server.
-; - Added to our sample set.
-; *** Continuation
-; - Frequency Analysis over random CVE selection.
-; - Determine set of distinquishing terms.
-; - Distinguishing terms = Common in sample, uncommon in random sample
-; - Weighting for distiguishing terms.
-; - Manual analysis of high scoring CVE.
-* LGTM
-; *** LGTM Extraction
-; - The extractor turns every source file into a relational representation: "trap" file.
-; - Separate extractor for each supported languages.
-; - Each language has a unique database schema.
-; - The schema specifies a table for every language construct.
-; #+ATTR_LATEX: :width 6cm
-; [[./lgtm-extraction.png]]
-; *** LGTM Methodology
-; [[./analysis_overview.png]]
-; *** CodeQL Database
-; - Contains hierarchical representation of the code base.
-; - Defines classes to provide abstraction over the database tables.
-; - Object-oriented view of the data which makes it easier to write queries.
-; - For JS program, three key tables: Expressions, Statements, Declarations
-; - CodeQL library defines classes over these tables (and related auxiliary tables): Expr, Stmt, Decl.
-; *** CodeQL CLI
-; Javascript OSC QL Pack
-; - Focusing on the AST tables in DB
-; - 5 packages: depot, pouchdb, jade, prototype (prototypeJS),  mocha
-; - Examination of depot0.1.6
-; [[./depotSink.png]]
-; *** Sink Finding (LGTM)
-; #+ATTR_LATEX: :width 10cm
-; [[./ExplainationQueryV2.png]]
-; *** Continuation
-; - Develop the sink finder methodology within LGTM
-;   - Control Flow, Data Flow, Taint tracking, Bounds analysis
-; - Develop CodeQL query for each sink found by Sink Finder.
-; - Expand set of sinks based on expandig signatures.
-; - Reduce false positives.
-; - Generate alerts for full vulnerability (Sink/Source/Flow).
+*** Natural Language Processing (NLTK)
+ - Python framework for processing language data
+ - Tested NLP ML library - Bayes Classifier
+ - Tested 3000 training points, 75% accuracy
+ - Limited training data ~40 CVEs
+ - We are using NLP frequency analysis
+
+ *** Frequency Analysis
+ - Generated frequency distributions over 34 injection CVE
+ - Normalization: eliminate symbols, lingustic stemming, remove stopwords
+ - Glossary of terms: code, execut, arbitrari, inject, command, sqlite,
+   shell, sequel, sql, waterlin, postgr, mysql
+ #+ATTR_LATEX: :width 5cm
+ [[./figures/stem.png]]
+
+ *** Sample Set Frequency
+ #+ATTR_LATEX: :width 6cm
+ [[./sampleFreq.png]]
+ - 34 Javacript CVEs
+ - CWE-77 Command Injection, CWE-78 OS Command Injection, CWE-89 SQL
+   Injection, CWE-94 Code Injection
+
+ *** Frequency Results
+ - 537 JavaScript CVEs
+ - Likely relevant:
+     - CWE-200 Information Exposure,
+     - CWE-20 Improper Input Validation,
+     - CWE-74 Injection
+ - Included: CWE-22,310,79,400,399,254
+
+ *** Detailed Table
+ #+ATTR_LATEX: :width 9cm
+ [[./figures/freq_res.png]]
+
+ *** Test Set Frequency
+ [[./figures/testFreq.png]]
+
+ *** Injection (CWE-74)
+ - Command, data structure, or record with externally-influenced input.
+ - Nine JS CVE under CWE-74 classification
+ - Ex. CVE-2019-5479, larvitbase-api
+     - Provides a new signature.
+     - Code injection that relies on a dynamic require(), vulnerable to local file inclusion.
+ - All nine were added to our sample set.
+
+ *** Relevant CVE Analysis
+ CVE-2016-10548 - Under CWE-94 (XSS)
+ - Very relevant - 4 most relevant terms
+ - Versions of reduce-css-calc pass input directly to eval.
+ - Already covered signature.
+ - If input is passed to the calc function it can lead to remote code execution on the server.
+ - Added to our sample set.
+
+ *** Continuation
+ - Frequency Analysis over random CVE selection.
+ - Determine set of distinquishing terms.
+ - Distinguishing terms = Common in sample, uncommon in random sample
+ - Weighting for distiguishing terms.
+ - Manual analysis of high scoring CVE.
+ LGTM
+ *** LGTM Extraction
+ - The extractor turns every source file into a relational representation: "trap" file.
+ - Separate extractor for each supported languages.
+ - Each language has a unique database schema.
+ - The schema specifies a table for every language construct.
+ #+ATTR_LATEX: :width 6cm
+ [[./lgtm-extraction.png]]
+ *** LGTM Methodology
+ [[./figures/analysis_overview.png]]
+
+ *** CodeQL Database
+ - Contains hierarchical representation of the code base.
+ - Defines classes to provide abstraction over the database tables.
+ - Object-oriented view of the data which makes it easier to write queries.
+ - For JS program, three key tables: Expressions, Statements, Declarations
+ - CodeQL library defines classes over these tables (and related auxiliary tables): Expr, Stmt, Decl.
+
+ *** CodeQL CLI
+ Javascript OSC QL Pack
+ - Focusing on the AST tables in DB
+ - 5 packages: depot, pouchdb, jade, prototype (prototypeJS),  mocha
+ - Examination of depot0.1.6
+ [[./figures/depotSink.png]]
+
+
+ *** Sink Finding (LGTM)
+ #+ATTR_LATEX: :width 10cm
+ [[./figures/ExplainationQueryV2.png]]
+
+ *** LGTM Results 
+ [[./figures/csvQueriesResult.PNG]]
+ - We are able to locate sinks using CodeQL.
+
+ 
+ *** Continuation
+ - Develop the sink finder methodology within LGTM
+   - Control Flow, Data Flow, Taint tracking, Bounds analysis
+ - Develop more CodeQL query for each sink found by Sink Finder.
+ - Expand set of sinks based on expanding signatures.
+ - Reduce false positives.
+ - Generate alerts for full vulnerability (Sink/Source/Flow).
 * OSC Benchmark
+
 *** Current JS Benchmark Status
 - Built with synthetic examples
 - Tests are either a true or false positive
@@ -129,14 +148,17 @@
     - 5 created from our testing over SQL injections, JS injections, and OS cmd injection
     - 2 created from relevant CVEs for variant analysis
     - 2 from code obfuscations we've previously discovered
+
 *** Benchmark Progress
 - Script for automaticlly generating scorecards
     - Based off tool's results given in a csv file
     - Breaks down the tool's true/false positive and false negative rate for any cwe
+
 *** Continuation
 - Updating score card script to run the tool (LGTM) and use results to generate scorecard
 - Adjusting benchmarks so they reflect library vulnerabilities instead of developer side APIs
 * Submitting our Findings
+
 *** CVE-ID Registration
 - Learned the process for submitting a CVE-ID request & created a template for said process
 - Collected data necessary to make CVE-ID requests for the following packages:
@@ -145,6 +167,7 @@
  - PrototypeJS
 - CNA (CVE Numbering Authority) for all three packages is Nodejs
 - All information gathered has been submitted to team for review
+
 * Paper
 *** Paper Proposals
 -On hold, James is away due to the pandemic.
