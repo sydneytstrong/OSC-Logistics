@@ -40,11 +40,11 @@
 * CVE Classification
 
 * LGTM
-*** Where We Left Off: LGTM
+*** Where We Left Off
  - There were issues with getting LGTM to Work
  - We have been working on the CodeQL CLI
     - Issues regarding processing Metadata and .yml files to compile our queries through the CLI
-*** What is new: LGTM
+*** What's New
 - Metadata and .yml issues have now been resolved.
 - CodeQL CLI is running
   - For our Custom queries
