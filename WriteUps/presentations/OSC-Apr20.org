@@ -17,7 +17,7 @@
 #+LaTeX_HEADER: \usepackage{minted}
 #+LaTeX_HEADER: \usemintedstyle{emacs}
 #+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
-#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{comcast.png}}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{figures/comcast.png}}
 #+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
 
 #+name: setup-minted
