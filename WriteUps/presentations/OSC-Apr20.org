@@ -133,9 +133,9 @@
 
 * Summary
 *** What We Have Done So Far
-- CVE part
-- LGTM part
+- Found 3 CVEs that fit our classifications
+- Got the CLI for LGTM to work and using custom queries
 - Created a scorescard to assess tool's reliability
-- Submited our found CVEs
+- Submited the vulnerabilties we had found as CVEs
 *** Questions?
 - Questions and Comments?
