@@ -66,7 +66,7 @@
 
 *** Interpreting scorecards
 - Quick reference on how to use scorecard results
-[./figures/benchmark_guide.png]]
+[[./figures/benchmark_guide.png]]
 
 *** Future Work
 - Updating score card script to integrate the tool (LGTM) to run over benchmarks and generate score card automatically
