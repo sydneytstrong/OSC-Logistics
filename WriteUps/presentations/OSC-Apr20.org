@@ -38,65 +38,42 @@
 #+end_src
 
 * CVE Classification
-*** Natural Language Processing (NLTK)
- - Python framework for processing language data
- - Tested NLP ML library - Bayes Classifier
- - Tested 3000 training points, 75% accuracy
- - Limited training data ~40 CVEs
- - We are using NLP frequency analysis
+*** Last Time
+- Generated frequency distributions over 34 injection CVE
+- Manually decided relevant terms via ranking by highest frequency
+- Scored relevancy of rest of database by occurence of these terms
+[[./figures/stem.png]]
 
-*** Frequency Analysis
- - Generated frequency distributions over 34 injection CVE
- - Normalization: eliminate symbols, lingustic stemming, remove stopwords
- - Glossary of terms: code, execut, arbitrari, inject, command, sqlite,
-   shell, sequel, sql, waterlin, postgr, mysql
- #+ATTR_LATEX: :width 5cm
- [[./figures/stem.png]]
+*** Results From Last Time
+- Many entries scored highly, suggesting relevant terms were not specific enough
+#+ATTR_LATEX: :width 9cm
+[[./figures/freq_res.png]]
 
-*** Sample Set Frequency
- #+ATTR_LATEX: :width 6cm
- [[./figures/sampleFreq.png]]
- - 34 Javacript CVEs
- - CWE-77 Command Injection, CWE-78 OS Command Injection, CWE-89 SQL
-   Injection, CWE-94 Code Injection
+*** Refining Search Method
+- Determined set of distinquishing terms.
+- Distinguishing terms = Common in sample, uncommon in random sample
+- Results seem near identical to manually identified terms
+[[./figures/monogram-distinguished-frequency.png]]
 
-*** Frequency Results
- - 537 JavaScript CVEs
- - Likely relevant:
-     - CWE-200 Information Exposure,
-     - CWE-20 Improper Input Validation,
-     - CWE-74 Injection
- - Included: CWE-22,310,79,400,399,254
+*** Refining Search Method cont.
+- Same process was used to find frequency distribution of bigrams from relevant CVE summaries
+[[./figures/bigram-sample-frequency.png]]
 
-*** Detailed Table
- #+ATTR_LATEX: :width 9cm
- [[./figures/freq_res.png]]
+*** Bigram Occurence Analysis Results
+- Less CVEs were found, but found to have more relavance
+- [[./figures/bigram-analysis-results.png]]
 
-*** Test Set Frequency
- [[./figures/testFreq.png]]
+*** Example: CVE-2018-3772
+- Entered in Database as CWE-20 (Improper Input Validation)
+- While true, this vulnerability can lead to a Command Injection attack, as mentioned in description:
+- "Concatenating unsanitized user input in the `whereis` npm module < 0.4.1 allowed an attacker to execute arbitrary commands. The `whereis` module is deprecated and it is recommended to use the `which` npm module instead."
 
-*** Injection (CWE-74)
- - Command, data structure, or record with externally-influenced input.
- - Nine JS CVE under CWE-74 classification
- - Ex. CVE-2019-5479, larvitbase-api
-     - Provides a new signature.
-     - Code injection that relies on a dynamic require(), vulnerable to local file inclusion.
- - All nine were added to our sample set.
-
-*** Relevant CVE Analysis
- CVE-2016-10548 - Under CWE-94 (XSS)
- - Very relevant - 4 most relevant terms
- - Versions of reduce-css-calc pass input directly to eval.
- - Already covered signature.
- - If input is passed to the calc function it can lead to remote code execution on the server.
- - Added to our sample set.
-
-*** Continuation
- - Frequency Analysis over random CVE selection.
+*** Moving Forward
+ - Bigram Analysis seems more precise, but yeilds fewer results.
+ - Continue manual analysis of high scoring CVE.
  - Determine set of distinquishing terms.
  - Distinguishing terms = Common in sample, uncommon in random sample
  - Weighting for distiguishing terms.
- - Manual analysis of high scoring CVE.
 
 *** LGTM Extraction
  - The extractor turns every source file into a relational representation: "trap" file.
@@ -127,11 +104,11 @@
  #+ATTR_LATEX: :width 10cm
  [[./figures/ExplainationQueryV2.png]]
 
-*** LGTM Results 
+*** LGTM Results
  [[./figures/csvQueriesResult.PNG]]
  - We are able to locate sinks using CodeQL.
 
- 
+
 *** Continuation
  - Develop the sink finder methodology within LGTM
    - Control Flow, Data Flow, Taint tracking, Bounds analysis
