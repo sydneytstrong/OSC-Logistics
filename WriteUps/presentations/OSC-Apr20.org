@@ -51,7 +51,7 @@
  - Glossary of terms: code, execut, arbitrari, inject, command, sqlite,
    shell, sequel, sql, waterlin, postgr, mysql
  #+ATTR_LATEX: :width 5cm
- [[./stem.png]]
+ [[./figures/stem.png]]
 
  *** Sample Set Frequency
  #+ATTR_LATEX: :width 6cm
@@ -70,10 +70,10 @@
 
  *** Detailed Table
  #+ATTR_LATEX: :width 9cm
- [[./freq_res.png]]
+ [[./figures/freq_res.png]]
 
  *** Test Set Frequency
- [[./testFreq.png]]
+ [[./figures/testFreq.png]]
 
  *** Injection (CWE-74)
  - Command, data structure, or record with externally-influenced input.
@@ -106,7 +106,7 @@
  #+ATTR_LATEX: :width 6cm
  [[./lgtm-extraction.png]]
  *** LGTM Methodology
- [[./analysis_overview.png]]
+ [[./figures/analysis_overview.png]]
 
  *** CodeQL Database
  - Contains hierarchical representation of the code base.
@@ -120,12 +120,12 @@
  - Focusing on the AST tables in DB
  - 5 packages: depot, pouchdb, jade, prototype (prototypeJS),  mocha
  - Examination of depot0.1.6
- [[./depotSink.png]]
+ [[./figures/depotSink.png]]
 
 
  *** Sink Finding (LGTM)
  #+ATTR_LATEX: :width 10cm
- [[./ExplainationQueryV2.png]]
+ [[./figures/ExplainationQueryV2.png]]
 
  *** LGTM Results 
  [[./figures/csvQueriesResult.PNG]]
