@@ -40,9 +40,41 @@
 * CVE Classification
 
 * LGTM
-*** LGTM Results
+*** Where We Left Off: LGTM
+ - There were issues with getting LGTM to Work
+ - We have been working on the CodeQL CLI
+    - Issues regarding processing Metadata and .yml files to compile our queries through the CLI
+*** What is new: LGTM
+- Metadata and .yml issues have now been resolved.
+- CodeQL CLI is running
+  - For our Custom queries
+  - predefined queries from Semmle
+- We have results from our queries that suggest CodeQL can find our sinks
+*** The Query we primarily used
+- The query searches for a variable declaration with the call expression eval.
+[[./figures/Apr20_Queryused.PNG]]
+*** Result format
+- Column A: Query name
+- Column B: description of Query
+- Column C: problem type
+- Column D: message attached to query
+- Column E: Location
+- Column F: Starting Line Number
+- Column G: Starting column Number
+- Column H: Ending Line Number
+- Column I: Ending column Number
+*** CodeQL query Results
  [[./figures/csvQueriesResult.PNG]]
  - We are able to locate sinks using CodeQL.
+*** CodeQl Results Continuation
+- Here are the lines in the files corresponding to the results
+*** CodeQl results as shown in the files
+[[./figures/VisualSinksV2.png]]
+*** What is next for LGTM/CodeQL
+- Expand with understanding closure rules of CodeQL
+- Diversify with more queries for Code Injection
+- Continue to analyze the other packages we used the sink finder on
+- Consider possible automation of this process.
 
 
 * OSC Benchmark
