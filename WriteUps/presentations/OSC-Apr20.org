@@ -94,20 +94,35 @@
 *** The Query we primarily used
 - The query searches for a variable declaration with the call expression eval.
 [[./figures/Apr20_Queryused.PNG]]
-*** Result format
-- Column A: Query name
-- Column B: description of Query
-- Column C: problem type
-- Column D: message attached to query
-- Column E: Location
-- Column F: Starting Line Number
-- Column G: Starting column Number
-- Column H: Ending Line Number
-- Column I: Ending column Number
-*** CodeQL query Results
-#+ATTR_LATEX: :width 7cm
+*** Code QL Results
+ :PROPERTIES:
+   :BEAMER_envargs: [t]
+   :END:
+ We are able to locate sinks using ~CodeQL~.
+**** Format                                                :BMCOL:B_block:
+:PROPERTIES:
+    :BEAMER_col: 0.35
+    :BEAMER_opt: [T]
+    :BEAMER_env: block
+    :END:
+\scriptsize
+- A: Query name
+- B: Description
+- C: problem type
+- D: message 
+- E: Location
+- F: Starting LOC
+- G: Starting COC
+- H: Ending LOC
+- I: Ending COC
+**** Output :BMCOL:B_block:
+:PROPERTIES:
+    :BEAMER_col: 0.60
+    :BEAMER_opt: [T]
+    :BEAMER_env: block
+   :END:
+#+ATTR_LATEX: :width 6cm
 [[./figures/csvQueriesResult.PNG]]
- - We are able to locate sinks using CodeQL.
 *** Result Details
 [[./figures/VisualSinksV2.png]]
 *** What is next...
@@ -115,7 +130,7 @@
 - Expand set of queries for Code Injection
 - Analyze the other packages we used the sink finder on
 - Consider possible automation of this process.
-
+  
 
 * OSC Benchmark
 
