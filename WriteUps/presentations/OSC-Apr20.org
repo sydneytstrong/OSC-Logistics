@@ -38,148 +38,104 @@
 #+end_src
 
 * CVE Classification
-*** Natural Language Processing (NLTK)
- - Python framework for processing language data
- - Tested NLP ML library - Bayes Classifier
- - Tested 3000 training points, 75% accuracy
- - Limited training data ~40 CVEs
- - We are using NLP frequency analysis
 
-*** Frequency Analysis
- - Generated frequency distributions over 34 injection CVE
- - Normalization: eliminate symbols, lingustic stemming, remove stopwords
- - Glossary of terms: code, execut, arbitrari, inject, command, sqlite,
-   shell, sequel, sql, waterlin, postgr, mysql
- #+ATTR_LATEX: :width 5cm
- [[./figures/stem.png]]
-
-*** Sample Set Frequency
- #+ATTR_LATEX: :width 6cm
- [[./figures/sampleFreq.png]]
- - 34 Javacript CVEs
- - CWE-77 Command Injection, CWE-78 OS Command Injection, CWE-89 SQL
-   Injection, CWE-94 Code Injection
-
-*** Frequency Results
- - 537 JavaScript CVEs
- - Likely relevant:
-     - CWE-200 Information Exposure,
-     - CWE-20 Improper Input Validation,
-     - CWE-74 Injection
- - Included: CWE-22,310,79,400,399,254
-
-*** Detailed Table
- #+ATTR_LATEX: :width 9cm
- [[./figures/freq_res.png]]
-
-*** Test Set Frequency
- [[./figures/testFreq.png]]
-
-*** Injection (CWE-74)
- - Command, data structure, or record with externally-influenced input.
- - Nine JS CVE under CWE-74 classification
- - Ex. CVE-2019-5479, larvitbase-api
-     - Provides a new signature.
-     - Code injection that relies on a dynamic require(), vulnerable to local file inclusion.
- - All nine were added to our sample set.
-
-*** Relevant CVE Analysis
- CVE-2016-10548 - Under CWE-94 (XSS)
- - Very relevant - 4 most relevant terms
- - Versions of reduce-css-calc pass input directly to eval.
- - Already covered signature.
- - If input is passed to the calc function it can lead to remote code execution on the server.
- - Added to our sample set.
-
-*** Continuation
- - Frequency Analysis over random CVE selection.
- - Determine set of distinquishing terms.
- - Distinguishing terms = Common in sample, uncommon in random sample
- - Weighting for distiguishing terms.
- - Manual analysis of high scoring CVE.
-
-*** LGTM Extraction
- - The extractor turns every source file into a relational representation: "trap" file.
- - Separate extractor for each supported languages.
- - Each language has a unique database schema.
- - The schema specifies a table for every language construct.
- #+ATTR_LATEX: :width 6cm
- [[./figures/lgtm-extraction.png]]
- *** LGTM Methodology
- [[./figures/analysis_overview.png]]
-
-*** CodeQL Database
- - Contains hierarchical representation of the code base.
- - Defines classes to provide abstraction over the database tables.
- - Object-oriented view of the data which makes it easier to write queries.
- - For JS program, three key tables: Expressions, Statements, Declarations
- - CodeQL library defines classes over these tables (and related auxiliary tables): Expr, Stmt, Decl.
-
-*** CodeQL CLI
- Javascript OSC QL Pack
- - Focusing on the AST tables in DB
- - 5 packages: depot, pouchdb, jade, prototype (prototypeJS),  mocha
- - Examination of depot0.1.6
- [[./figures/depotSink.png]]
-
-
-*** Sink Finding (LGTM)
- #+ATTR_LATEX: :width 10cm
- [[./figures/ExplainationQueryV2.png]]
-
-*** LGTM Results 
+* LGTM
+*** Where We Left Off: LGTM
+ - There were issues with getting LGTM to Work
+ - We have been working on the CodeQL CLI
+    - Issues regarding processing Metadata and .yml files to compile our queries through the CLI
+*** What is new: LGTM
+- Metadata and .yml issues have now been resolved.
+- CodeQL CLI is running
+  - For our Custom queries
+  - predefined queries from Semmle
+- We have results from our queries that suggest CodeQL can find our sinks
+*** The Query we primarily used
+- The query searches for a variable declaration with the call expression eval.
+[[./figures/Apr20_Queryused.PNG]]
+*** Result format
+- Column A: Query name
+- Column B: description of Query
+- Column C: problem type
+- Column D: message attached to query
+- Column E: Location
+- Column F: Starting Line Number
+- Column G: Starting column Number
+- Column H: Ending Line Number
+- Column I: Ending column Number
+*** CodeQL query Results
  [[./figures/csvQueriesResult.PNG]]
  - We are able to locate sinks using CodeQL.
+*** CodeQl Results Continuation
+- Here are the lines in the files corresponding to the results
+*** CodeQl results as shown in the files
+[[./figures/VisualSinksV2.png]]
+*** What is next for LGTM/CodeQL
+- Expand with understanding closure rules of CodeQL
+- Diversify with more queries for Code Injection
+- Continue to analyze the other packages we used the sink finder on
+- Consider possible automation of this process.
 
- 
-*** Continuation
- - Develop the sink finder methodology within LGTM
-   - Control Flow, Data Flow, Taint tracking, Bounds analysis
- - Develop more CodeQL query for each sink found by Sink Finder.
- - Expand set of sinks based on expanding signatures.
- - Reduce false positives.
- - Generate alerts for full vulnerability (Sink/Source/Flow).
 
 * OSC Benchmark
 
-*** Current JS Benchmark Status
-- Built with synthetic examples
+*** Where We Left Off
+- Build a JavaScript benchmark library with synthetic examples to mimic OWASP's benchmarks
 - Tests are either a true or false positive
 - Currently 9 benchmarks:
     - 5 created from our testing over SQL injections, JS injections, and OS cmd injection
     - 2 created from relevant CVEs for variant analysis
     - 2 from code obfuscations we've previously discovered
 
-*** Benchmark Progress
-- Script for automaticlly generating scorecards
-    - Based off tool's results given in a csv file
+*** What's New
+- Script for automatically generating scorecard
+    - Based off tool's results for a given in a csv file
     - Breaks down the tool's true/false positive and false negative rate for any cwe
+-OWASP's scorecard
+    [[./figures/OWASP_Card.png]]
+-Our scorecard
+    [[./figures/TEST_Card.png]]
 
-*** Continuation
-- Updating score card script to run the tool (LGTM) and use results to generate scorecard
-- Adjusting benchmarks so they reflect library vulnerabilities instead of developer side APIs
-* Submitting our Findings
+*** Interpreting scorecards
+- Quick reference on how to use scorecard results
+[[./figures/benchmark_guide.png]]
 
+*** Future Work
+- Updating score card script to integrate the tool (LGTM) to run over benchmarks and generate score card automatically
+
+* CVE-ID Registration
 *** CVE-ID Registration
-- Learned the process for submitting a CVE-ID request & created a template for said process
+- Learned the process for submitting a CVE-ID request
+- For most vulnerabilties, contact the appropriate CNA (CVE Numbering Authority) and give appropriate info:
+ - Usually need vulnerability type, a description, impact, and affected products (including version)
+- If a CNA is not listed for a particular software, fill out request form on CVE website
+*** Registering What We Have Found
 - Collected data necessary to make CVE-ID requests for the following packages:
  - Jade
  - Depot
  - PrototypeJS
-- CNA (CVE Numbering Authority) for all three packages is Nodejs
-- All information gathered has been submitted to team for review
+- CNA for all three packages is Nodejs
+*** Vulnerability Information
+- Jade: Command line expects a file name as input. However, if javascript is provided and not a file,
+	then fs.readfileSync will catch and evaluate the javascript given as input.
+ - Vulnerability type: Server side JS injection
+ - Affected product: Jade version 1.11.0
+ - Impact: Code Execution
+- Depot: code can be injected directly into input box succeeding a semicolon.
+ - Vulnerability type: Server Side JS Injection
+ - Affected product: Depot v0.1.6
+ - Impact: Code Execution
+- PrototypeJS: improper use of eval() is used in a way that leaves the application vulnerable to injection attacks
+ - two vulnerabiltiies, one server side and one client side
+ - Vulnerability type: Server and Client side JS Injection
+ - Affected product: Prototype version 0.0.5
+ - Impact: Code Execution
 
 * Summary
 *** What We Have Done So Far
-- Evaluating sorted list of CVEs by relevance
-- Added 10 CVE to our sample of useable CVEs
-- Evaluation of LGTM Methodology
-- LGTM CodeQL query for sink finding
-- Built basic benchmark with 6 tests
-- Identified 2 new signatures from CVEs
-* Work Plan
-*** Feedback
-- Other directions?
-- New business items?
-* Questions and Comments?
+- Found 3 CVEs that fit our classifications
+- Got the CLI for LGTM to work and using custom queries
+- Created a scorescard to assess tool's reliability
+- Submited the vulnerabilties we had found as CVEs
 *** Questions?
+- Questions and Comments?
