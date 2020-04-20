@@ -39,7 +39,7 @@
 
 * CVE Classification
 
-
+* LGTM
 *** LGTM Results
  [[./figures/csvQueriesResult.PNG]]
  - We are able to locate sinks using CodeQL.
@@ -59,7 +59,9 @@
 - Script for automatically generating scorecard
     - Based off tool's results for a given in a csv file
     - Breaks down the tool's true/false positive and false negative rate for any cwe
+-OWASP's scorecard
     [[./figures/OWASP_Card.png]]
+-Our scorecard
     [[./figures/TEST_Card.png]]
 
 *** Interpreting scorecards
