@@ -168,7 +168,7 @@
 
 * Summary
 *** What We Have Done So Far
-- Found 3 CVEs that fit our classifications
+- Use Bigram analysis along with manual analysis in highest scoring cves
 - Got the CLI for LGTM to work and using custom queries
 - Created a scorescard to assess tool's reliability
 - Submited the vulnerabilties we had found as CVEs
