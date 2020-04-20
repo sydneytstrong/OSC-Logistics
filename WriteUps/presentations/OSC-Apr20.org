@@ -106,7 +106,8 @@
 - Column H: Ending Line Number
 - Column I: Ending column Number
 *** CodeQL query Results
- [[./figures/csvQueriesResult.PNG]]
+#+ATTR_LATEX: :width 7cm
+[[./figures/csvQueriesResult.PNG]]
  - We are able to locate sinks using CodeQL.
 *** Result Details
 [[./figures/VisualSinksV2.png]]
