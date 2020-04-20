@@ -34,7 +34,7 @@ The Benchmark Accuracy Score is essentially a Youden Index, which is a standard 
 
 This is just a visual to show the guessing line and what different scores mean.
 
-![](https://raw.githubusercontent.com/OWASP/Benchmark/master/src/main/resources/scorecard/content/benchmark_guide.png)
+![](/Users/alexoneill/Desktop/benchmark_guide.png)
 
 ###The Score Card
 

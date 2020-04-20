@@ -127,11 +127,11 @@
  #+ATTR_LATEX: :width 10cm
  [[./figures/ExplainationQueryV2.png]]
 
-*** LGTM Results 
+*** LGTM Results
  [[./figures/csvQueriesResult.PNG]]
  - We are able to locate sinks using CodeQL.
 
- 
+
 *** Continuation
  - Develop the sink finder methodology within LGTM
    - Control Flow, Data Flow, Taint tracking, Bounds analysis
@@ -142,32 +142,51 @@
 
 * OSC Benchmark
 
-*** Current JS Benchmark Status
-- Built with synthetic examples
+*** Where We Left Off
+- Build a JavaScript benchmark library with synthetic examples to mimic OWASP's benchmarks
 - Tests are either a true or false positive
 - Currently 9 benchmarks:
     - 5 created from our testing over SQL injections, JS injections, and OS cmd injection
     - 2 created from relevant CVEs for variant analysis
     - 2 from code obfuscations we've previously discovered
 
-*** Benchmark Progress
-- Script for automaticlly generating scorecards
-    - Based off tool's results given in a csv file
+*** What's New
+- Script for automatically generating scorecard
+    - Based off tool's results for a given in a csv file
     - Breaks down the tool's true/false positive and false negative rate for any cwe
+    [[./figures/OWASP_Card.png]]
+    [[./figures/TEST_Card.png]]
 
-*** Continuation
-- Updating score card script to run the tool (LGTM) and use results to generate scorecard
-- Adjusting benchmarks so they reflect library vulnerabilities instead of developer side APIs
-* Submitting our Findings
+*** Future Work
+- Updating score card script to integrate the tool (LGTM) to run over benchmarks and generate score card automatically
 
+* CVE-ID Registration
 *** CVE-ID Registration
-- Learned the process for submitting a CVE-ID request & created a template for said process
+- Learned the process for submitting a CVE-ID request
+- For most vulnerabilties, contact the appropriate CNA (CVE Numbering Authority) and give appropriate info:
+ - Usually need vulnerability type, a description, impact, and affected products (including version)
+- If a CNA is not listed for a particular software, fill out request form on CVE website
+*** Registering What We Have Found
 - Collected data necessary to make CVE-ID requests for the following packages:
  - Jade
  - Depot
  - PrototypeJS
-- CNA (CVE Numbering Authority) for all three packages is Nodejs
-- All information gathered has been submitted to team for review
+- CNA for all three packages is Nodejs
+*** Vulnerability Information
+- Jade: Command line expects a file name as input. However, if javascript is provided and not a file,
+	then fs.readfileSync will catch and evaluate the javascript given as input.
+ - Vulnerability type: Server side JS injection
+ - Affected product: Jade version 1.11.0
+ - Impact: Code Execution
+- Depot: code can be injected directly into input box succeeding a semicolon.
+ - Vulnerability type: Server Side JS Injection
+ - Affected product: Depot v0.1.6
+ - Impact: Code Execution
+- PrototypeJS: improper use of eval() is used in a way that leaves the application vulnerable to injection attacks
+ - two vulnerabiltiies, one server side and one client side
+ - Vulnerability type: Server and Client side JS Injection
+ - Affected product: Prototype version 0.0.5
+ - Impact: Code Execution
 
 * Summary
 *** What We Have Done So Far
