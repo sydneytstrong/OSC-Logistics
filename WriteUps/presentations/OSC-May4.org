@@ -1,0 +1,179 @@
+#+TITLE:     OSC Update
+#+AUTHOR:    A. Jbara, L. Michel, A. Herzberg, J. Breslin
+#+EMAIL:     ldm@engr.uconn.edu
+#+DATE: \today
+#+DESCRIPTION:
+#+KEYWORDS:
+#+BEAMER_THEME: Berlin
+#+BEAMER_COLOR_THEME: beaver
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:
+#+LINK_HOME:
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+#+BEAMER_HEADER: \logo{\includegraphics[height=.9cm]{figures/comcast.png}}
+#+LaTeX: \setbeamercolor{myblockcolor}{bg=magenta,fg=white}
+
+#+name: setup-minted
+#+begin_src emacs-lisp :exports none
+ (setq org-latex-listings 'minted)
+     (setq org-latex-custom-lang-environments
+           '(
+            (emacs-lisp "common-lispcode")
+             ))
+     (setq org-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+     (setq org-latex-to-pdf-process
+           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+* CVE Classification
+*** Last Time
+- Generated frequency distributions over 34 injection CVE
+- Manually decided relevant terms via ranking by highest frequency
+- Scored relevancy of rest of database by occurence of these terms
+
+*** Results From Last Time
+- Many entries scored highly, suggesting relevant terms were not specific enough
+#+ATTR_LATEX: :width 6cm
+[[./figures/freq_res.png]]
+
+*** Refining Search Method
+- Determined set of distinquishing terms.
+- Distinguishing terms = Common in sample, uncommon in random sample
+- Results seem near identical to manually identified terms
+#+ATTR_LATEX: :width 6cm
+[[./figures/monogram-distinguished-frequency.png]]
+
+*** Refining Search Method cont'd.
+- Same process was used to find frequency distribution of bi-grams from
+  relevant CVE summaries
+#+ATTR_LATEX: :width 6cm
+[[./figures/bigram-sample-frequency.png]]
+
+*** Bigram Occurence Analysis Results
+- Less CVEs were found, but found to have more relevance
+#+ATTR_LATEX: :width 8cm
+[[./figures/bigram-analysis-results.png]]
+
+*** Example: CVE-2018-3772
+- Entered in Database as CWE-20 (Improper Input Validation)
+- While true, this vulnerability can lead to a Command Injection attack, as mentioned in description:
+- "Concatenating unsanitized user input in the `whereis` npm module <
+  0.4.1 allowed an attacker to execute arbitrary commands. The
+  `whereis` module is deprecated and it is recommended to use the
+  `which` npm module instead."
+
+*** Next Step
+ - Bigram Analysis seems more precise, but yeilds fewer results.
+ - Continue manual analysis of high scoring CVEs from monogram (one-word term) analysis.
+ - Weighting for distiguishing terms.
+
+
+* LGTM
+*** Where We Left Off
+ - There were issues with getting LGTM to Work
+ - We have been working on the CodeQL CLI
+    - Issues regarding processing Metadata and .ql pack files to compile our queries through the CLI
+*** What's New
+- Metadata and .yml issues have now been resolved.
+- CodeQL CLI is running
+  - For our Custom queries
+  - predefined queries from Semmle
+- We have results from our queries that suggest CodeQL can find our sinks
+*** The Query we primarily used
+- The query searches for a variable declaration with the call expression eval.
+[[./figures/Apr20_Queryused.PNG]]
+*** Code QL Results
+ :PROPERTIES:
+   :BEAMER_envargs: [t]
+   :END:
+ We are able to locate sinks using ~CodeQL~.
+**** Format                                                :BMCOL:B_block:
+:PROPERTIES:
+    :BEAMER_col: 0.35
+    :BEAMER_opt: [T]
+    :BEAMER_env: block
+    :END:
+\scriptsize
+- A: Query name
+- B: Description
+- C: problem type
+- D: message
+- E: Location
+- F: Starting LOC
+- G: Starting COC
+- H: Ending LOC
+- I: Ending COC
+**** Output :BMCOL:B_block:
+:PROPERTIES:
+    :BEAMER_col: 0.60
+    :BEAMER_opt: [T]
+    :BEAMER_env: block
+   :END:
+#+ATTR_LATEX: :width 6cm
+[[./figures/csvQueriesResult.PNG]]
+*** Result Details
+[[./figures/VisualSinksV2.png]]
+*** What is next...
+- Expand with understanding closure rules of CodeQL
+- Expand set of queries for Code Injection
+- Analyze the other packages we used the sink finder on
+- Consider possible automation of this process.
+
+
+* OSC Benchmark
+
+*** Where We Left Off
+- Build a JavaScript benchmark library with synthetic examples to mimic OWASP's benchmarks
+- Tests are either a true or false positive
+- Currently 9 benchmarks:
+- Automatically generates scorecards
+
+
+*** What's New
+- Working with Kerwin on the LGTM script
+  - Will run our custom quieres on a target directory
+
+
+*** Next Step
+- Integrating LGTM driver script to use the scorecard generation script
+
+* CVE-ID Registration
+*** CVE-ID Registration
+- Learned the process for submitting a CVE-ID request
+- For most vulnerabilties, contact the appropriate CNA (CVE Numbering Authority) and give appropriate info:
+ - Usually need vulnerability type, a description, impact, and affected products (including version)
+- If a CNA is not listed for a particular software, fill out request form on CVE website
+*** Registering What We Have Found
+- Collected data necessary to make CVE-ID requests for the following packages:
+ - Jade
+ - Depot
+ - PrototypeJS
+- CNA for all three packages is ~Nodejs~
+- CVE request filed at ~cve-request@iojs.org~
+*** Vulnerability Information Example (Depot)
+#+ATTR_LATEX: :width 6cm
+- Depot: code can be injected directly into input box succeeding a semicolon.
+ - Vulnerability type: Server Side JS Injection
+ - Affected product: Depot v0.1.6
+ - Impact: Code Execution
+
+* Summary
+*** What We Have Done So Far
+- Use Bigram analysis along with manual analysis in highest scoring cves
+- Got the CLI for LGTM to work and using custom queries
+- Created a scorescard to assess tool's reliability
+- Submited the vulnerabilties we had found as CVEs
+*** Questions?
+- Questions and Comments?
