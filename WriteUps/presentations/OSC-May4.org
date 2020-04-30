@@ -82,54 +82,33 @@
 
 * LGTM
 *** Where We Left Off
- - There were issues with getting LGTM to Work
- - We have been working on the CodeQL CLI
-    - Issues regarding processing Metadata and .ql pack files to compile our queries through the CLI
-*** What's New
-- Metadata and .yml issues have now been resolved.
-- CodeQL CLI is running
-  - For our Custom queries
-  - predefined queries from Semmle
-- We have results from our queries that suggest CodeQL can find our sinks
-*** The Query we primarily used
-- The query searches for a variable declaration with the call expression eval.
-[[./figures/Apr20_Queryused.PNG]]
-*** Code QL Results
- :PROPERTIES:
-   :BEAMER_envargs: [t]
-   :END:
- We are able to locate sinks using ~CodeQL~.
-**** Format                                                :BMCOL:B_block:
-:PROPERTIES:
-    :BEAMER_col: 0.35
-    :BEAMER_opt: [T]
-    :BEAMER_env: block
-    :END:
-\scriptsize
-- A: Query name
-- B: Description
-- C: problem type
-- D: message
-- E: Location
-- F: Starting LOC
-- G: Starting COC
-- H: Ending LOC
-- I: Ending COC
-**** Output :BMCOL:B_block:
-:PROPERTIES:
-    :BEAMER_col: 0.60
-    :BEAMER_opt: [T]
-    :BEAMER_env: block
-   :END:
-#+ATTR_LATEX: :width 6cm
-[[./figures/csvQueriesResult.PNG]]
-*** Result Details
-[[./figures/VisualSinksV2.png]]
-*** What is next...
-- Expand with understanding closure rules of CodeQL
 - Expand set of queries for Code Injection
 - Analyze the other packages we used the sink finder on
 - Consider possible automation of this process.
+
+*** What's New
+- Major Advancement in automation for CodeQL 
+- Why? 
+  - "Feed two birds with one scone"
+  - Free up resources to focus on expanding set of queries 
+  - Able to analyze other packages faster
+  - reduce operation time for evaluating query performance and JS packages
+  - Modularity for easier troubleshooting 
+  
+*** CodeQL automation capablities 
+- Set up uniform File-Directory structure for easier troubleshooting and accessiblity
+- Applies Query(ies) to JS packages
+  - Able to specify versions
+  - If you do not have the package, it will extract it for you automatically
+- Groups different versions of packages together
+- Sets up CodeQL Databases, query compliation, and run the query automatically
+- Able to clean and reconstruct CodeQL Databases for optimal disk management and to avoid dependencies issues 
+
+*** Next Steps
+- Revise documentation 
+- Fix edge case bugs
+- Verify query results
+- Expand sets of queries 
 
 
 * OSC Benchmark
